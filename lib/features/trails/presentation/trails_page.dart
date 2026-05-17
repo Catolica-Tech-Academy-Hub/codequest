@@ -1,25 +1,32 @@
+import 'package:codequest/features/trails/presentation/widgets/trail_card.dart';
+import 'package:codequest/features/trails/providers/trail_providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class TrailsPage extends StatelessWidget {
+class TrailsPage extends ConsumerWidget {
   const TrailsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(trailsProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Trilhas')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: <Widget>[
-          Card(
-            child: ListTile(
-              title: const Text('Flutter Básico'),
-              subtitle: const Text('5 níveis disponíveis'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.go('/trail/flutter-basico/level/nivel-01'),
-            ),
-          ),
-        ],
+      body: state.when(
+        data: (trails) => ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: trails.length,
+          itemBuilder: (context, index) {
+            final trail = trails[index];
+            return TrailCard(
+              trail: trail,
+              onTap: () => context.go('/trail/${trail.id}'),
+            );
+          },
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(child: Text(error.toString())),
       ),
     );
   }

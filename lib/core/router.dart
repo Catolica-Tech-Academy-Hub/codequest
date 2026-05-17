@@ -1,18 +1,21 @@
 import 'dart:async';
 
+import 'package:codequest/features/activities/presentation/activity_page.dart';
 import 'package:codequest/features/auth/providers/auth_providers.dart';
 import 'package:codequest/features/auth/presentation/login_page.dart';
 import 'package:codequest/features/auth/presentation/register_page.dart';
 import 'package:codequest/features/home/presentation/home_page.dart';
-import 'package:codequest/features/level/presentation/level_page.dart';
 import 'package:codequest/features/profile/presentation/profile_page.dart';
 import 'package:codequest/features/ranking/presentation/ranking_page.dart';
+import 'package:codequest/features/trails/presentation/trail_detail_page.dart';
 import 'package:codequest/features/trails/presentation/trails_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
+  // HOTFIX: mantém o authStateProvider vivo para o ref.read dentro do redirect enxergar AsyncData em vez de loading
+  ref.listen(authStateProvider, (_, __) {});
   final authRefreshNotifier = _StreamRouterRefreshNotifier(
     ref.watch(observeAuthStateActionProvider).call(),
   );
@@ -62,11 +65,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(
-        path: '/trail/:trailId/level/:levelId',
+        path: '/trail/:trailId',
         builder: (BuildContext context, GoRouterState state) {
-          return LevelPage(
+          return TrailDetailPage(
             trailId: state.pathParameters['trailId'] ?? '',
-            levelId: state.pathParameters['levelId'] ?? '',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/activity/:activityId',
+        builder: (BuildContext context, GoRouterState state) {
+          return ActivityPage(
+            activityId: state.pathParameters['activityId'] ?? '',
+            trailId: state.uri.queryParameters['trailId'],
           );
         },
       ),

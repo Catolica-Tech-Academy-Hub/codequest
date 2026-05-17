@@ -8,13 +8,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Hive.initFlutter();
   await Firebase.initializeApp(
     options: AppFirebaseOptions.currentPlatform,
   );
   await configureFirebase();
-
   runApp(const ProviderScope(child: CodeQuestApp()));
 }
 

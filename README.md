@@ -163,10 +163,46 @@ make run-dev
 O que acontece ao executar:
 
 1. Verifica se o emulador `Pixel8_API35` já está rodando
-2. Se não estiver, inicia o emulador e aguarda o boot completo
-3. Roda `flutter run --dart-define=USE_EMULATOR=true`
+2. Se não estiver, inicia o emulador com renderização segura (`swiftshader_indirect`) e aguarda o boot completo
+3. Roda `flutter run --dart-define=USE_EMULATOR=true --no-enable-impeller`
 
 O flag `USE_EMULATOR=true` faz o app apontar para os emuladores locais do Firebase em vez da produção.
+
+### Fluxo recomendado no PowerShell
+
+Primeira subida completa:
+
+```powershell
+make up
+```
+
+Rodar apenas o app depois que a infra já está ativa:
+
+```powershell
+make run-dev
+```
+
+Parar somente o app Flutter:
+
+```text
+q
+```
+
+ou `Ctrl + C` no terminal onde o Flutter está rodando.
+
+Parar Firebase/Docker:
+
+```powershell
+make down
+```
+
+Reiniciar tudo do zero:
+
+```powershell
+make down
+adb emu kill
+make up
+```
 
 ---
 
@@ -176,6 +212,7 @@ O flag `USE_EMULATOR=true` faz o app apontar para os emuladores locais do Fireba
 | -------------------- | --------------------------------------------------------- |
 | `make infra-up`      | Setup completo: Android SDK + Docker + Firebase Emulators |
 | `make infra-down`    | Para e remove os containers Docker                        |
+| `make down`          | Alias de `make infra-down`                                |
 | `make run-dev`       | Inicia emulador (se necessário) + `flutter run`           |
 | `make up`            | `infra-up` + `bootstrap` + `run-dev`                      |
 | `make bootstrap`     | Instala dependências e roda geração de código             |
@@ -248,6 +285,7 @@ lib/features/<feature>/
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)                     | Arquitetura detalhada                       |
 | [`docs/ENGINEERING_GUIDELINES.md`](docs/ENGINEERING_GUIDELINES.md) | Boas práticas de engenharia                 |
 | [`docs/BUSINESS_CORE_AUTH.md`](docs/BUSINESS_CORE_AUTH.md)         | Regras de negócio do módulo de autenticação |
+| [`docs/RELEASE_AND_FIREBASE.md`](docs/RELEASE_AND_FIREBASE.md)     | Firebase real, release e publicação Android |
 
 ---
 
@@ -350,12 +388,41 @@ Inclua no corpo do PR:
 
 ---
 
+### App abre, mas mostra só o wallpaper/tela vazia do Android
+
+**Sintoma:** o app parece estar aberto, mas a tela mostra apenas o fundo do Android Emulator ou uma tela sem widgets.
+
+**Causa provável:** bug de renderização GPU do Android Emulator com o backend gráfico padrão.
+
+**Solução:**
+
+```powershell
+adb emu kill
+make run-dev
+```
+
+O script `make run-dev` inicia o AVD `Pixel8_API35` com `-gpu swiftshader_indirect -no-snapshot-load` e roda o app com `--no-enable-impeller`, que é o modo estável validado para este projeto no Windows.
+
+---
+
+### App fica preso em loading
+
+**Sintoma:** aparece um loading circular e a tela de login não carrega.
+
+**Solução:**
+
+1. Confirme que os emuladores Firebase estão ativos em http://localhost:4000
+2. Rode `make seed` se os usuários de teste não existirem no Auth Emulator
+3. Reinicie o app com `make run-dev`
+
+---
+
 ### Seed falhou ou dados estão inconsistentes
 
 **Solução:**
 
 ```bash
-make infra-down
+make down
 make infra-up
 make seed
 ```

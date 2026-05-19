@@ -12,8 +12,9 @@ class AuthRepository implements AuthRepositoryContract {
   final FirebaseAuth _auth;
 
   @override
-  Stream<AuthUser?> get authStateChanges {
-    return _auth.authStateChanges().map(_mapFirebaseUser);
+  Stream<AuthUser?> get authStateChanges async* {
+    yield _mapFirebaseUser(_auth.currentUser);
+    yield* _auth.authStateChanges().map(_mapFirebaseUser);
   }
 
   @override

@@ -3,7 +3,7 @@ SHELL := /bin/sh
 PROJECT_NAME := codequest
 FLUTTER_DEFINE_DEV := --dart-define=USE_EMULATOR=true
 
-.PHONY: help env-init up bootstrap infra-up infra-down android-setup run-dev clean logs seed deps gen analyze test build-apk run migrate ci doctor
+.PHONY: help env-init up bootstrap infra-up infra-down down android-setup run-dev clean logs seed deps gen analyze test build-apk run migrate ci doctor
 
 help:
 	@echo "Comandos disponíveis:"
@@ -22,7 +22,7 @@ help:
 	@echo "  make ci            - Executa pipeline local (analyze/test/build)"
 
 env-init:
-	@if [ ! -f .env ]; then cp .env.example .env && echo ".env criado a partir de .env.example"; else echo ".env já existe"; fi
+	powershell -NoProfile -ExecutionPolicy Bypass -Command "if (-not (Test-Path -LiteralPath '.env')) { Copy-Item -LiteralPath '.env.example' -Destination '.env'; Write-Host '.env criado a partir de .env.example' } else { Write-Host '.env ja existe' }"
 
 android-setup:
 	powershell -ExecutionPolicy Bypass -File scripts/android-setup.ps1
@@ -30,7 +30,7 @@ android-setup:
 run-dev:
 	powershell -ExecutionPolicy Bypass -File scripts/run-dev.ps1
 
-up: env-init infra-up deps migrate gen run
+up: env-init infra-up deps migrate gen run-dev
 
 bootstrap: env-init deps migrate gen
 
@@ -39,6 +39,8 @@ infra-up: env-init android-setup
 
 infra-down:
 	docker compose down
+
+down: infra-down
 
 clean:
 	flutter clean
@@ -56,10 +58,10 @@ deps:
 	npm --prefix firebase/seed install
 
 migrate:
-	@echo "Firestore é schemaless; índices e regras são aplicados pelos emuladores via firebase/firebase.json"
+	powershell -NoProfile -ExecutionPolicy Bypass -Command "Write-Host 'Firestore is schemaless; indexes and rules are loaded by Firebase emulators via firebase/firebase.json'"
 
 gen:
-	dart run build_runner build --delete-conflicting-outputs
+	dart run build_runner build --force-jit
 
 analyze:
 	flutter analyze

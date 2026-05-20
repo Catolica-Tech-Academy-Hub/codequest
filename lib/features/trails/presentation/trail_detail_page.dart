@@ -1,4 +1,4 @@
-import 'package:codequest/features/trails/presentation/widgets/activity_node.dart';
+import 'package:codequest/features/trails/presentation/widgets/level_node.dart';
 import 'package:codequest/features/trails/providers/trail_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,12 +35,12 @@ class TrailDetailPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            for (var i = 0; i < trail.activityIds.length; i++)
-              ActivityNode(
+            for (var i = 0; i < trail.levelIds.length; i++)
+              LevelNode(
                 index: i + 1,
                 alignment: Alignment.center,
                 onTap: () => context.go(
-                  '/activity/${trail.activityIds[i]}?trailId=${trail.id}',
+                  '/level/${trail.levelIds[i]}?trailId=${trail.id}',
                 ),
               ),
           ],

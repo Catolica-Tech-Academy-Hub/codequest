@@ -11,14 +11,14 @@ class MockTrailDataSource implements TrailDataSource {
         id: 'flutter-basico',
         title: 'Flutter Básico',
         description: 'Fundamentos de Flutter e Dart.',
-        activityIds: <String>[
-          'activity_0',
-          'activity_1',
-          'activity_2',
-          'activity_3',
-          'activity_4',
-          'activity_5',
-          'activity_6',
+        levelIds: <String>[
+          'level_0',
+          'level_1',
+          'level_2',
+          'level_3',
+          'level_4',
+          'level_5',
+          'level_6',
         ],
       ),
     ];

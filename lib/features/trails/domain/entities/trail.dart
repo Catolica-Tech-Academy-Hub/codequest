@@ -3,11 +3,11 @@ class Trail {
     required this.id,
     required this.title,
     required this.description,
-    required this.activityIds,
+    required this.levelIds,
   });
 
   final String id;
   final String title;
   final String description;
-  final List<String> activityIds;
+  final List<String> levelIds;
 }

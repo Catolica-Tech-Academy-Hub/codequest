@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:codequest/features/activities/presentation/activity_page.dart';
+import 'package:codequest/features/levels/presentation/level_page.dart';
 import 'package:codequest/features/auth/providers/auth_providers.dart';
 import 'package:codequest/features/auth/presentation/login_page.dart';
 import 'package:codequest/features/auth/presentation/register_page.dart';
@@ -73,10 +73,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/activity/:activityId',
+        path: '/level/:levelId',
         builder: (BuildContext context, GoRouterState state) {
-          return ActivityPage(
-            activityId: state.pathParameters['activityId'] ?? '',
+          return LevelPage(
+            levelId: state.pathParameters['levelId'] ?? '',
             trailId: state.uri.queryParameters['trailId'],
           );
         },

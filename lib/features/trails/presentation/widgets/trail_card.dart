@@ -23,7 +23,7 @@ class TrailCard extends StatelessWidget {
               Text(trail.description),
               const SizedBox(height: 4),
               Text(
-                '${trail.activityIds.length} atividade(s)',
+                '${trail.levelIds.length} níveis',
                 style: theme.textTheme.bodySmall,
               ),
             ],

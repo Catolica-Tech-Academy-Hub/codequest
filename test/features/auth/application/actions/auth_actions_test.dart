@@ -1,7 +1,9 @@
 import 'package:codequest/features/auth/application/actions/sign_in_action.dart';
 import 'package:codequest/features/auth/application/actions/sign_up_action.dart';
 import 'package:codequest/features/auth/domain/entities/auth_user.dart';
+import 'package:codequest/features/auth/domain/entities/user_profile.dart';
 import 'package:codequest/features/auth/domain/repositories/auth_repository_contract.dart';
+import 'package:codequest/features/auth/domain/repositories/user_profile_repository_contract.dart';
 import 'package:codequest/features/auth/domain/value_objects/display_name.dart';
 import 'package:codequest/features/auth/domain/value_objects/email_address.dart';
 import 'package:codequest/features/auth/domain/value_objects/password.dart';
@@ -10,11 +12,23 @@ import 'package:mocktail/mocktail.dart';
 
 class _AuthRepositoryMock extends Mock implements AuthRepositoryContract {}
 
+class _UserProfileRepositoryMock extends Mock
+    implements UserProfileRepositoryContract {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(EmailAddress('fallback@test.com'));
     registerFallbackValue(Password('Fallback12'));
     registerFallbackValue(DisplayName('Fallback User'));
+    registerFallbackValue(
+      UserProfile(
+        uid: 'fallback',
+        email: 'fallback@test.com',
+        name: 'Fallback',
+        leagueId: 'bronze-001',
+        createdAt: DateTime(2024),
+      ),
+    );
   });
 
   group('SignInAction', () {
@@ -52,12 +66,17 @@ void main() {
   group('SignUpAction', () {
     test('encaminha VOs validos para o repositorio', () async {
       final repository = _AuthRepositoryMock();
-      final action = SignUpAction(repository);
+      final profileRepository = _UserProfileRepositoryMock();
+      final action = SignUpAction(repository, profileRepository);
       final expectedUser = const AuthUser(
         uid: 'u2',
         email: 'newuser@test.com',
         displayName: 'New User',
       );
+
+      when(
+        () => profileRepository.createProfile(any()),
+      ).thenAnswer((_) async {});
 
       when(
         () => repository.signUp(

@@ -69,7 +69,17 @@ else {
 # 4. Aceitar licencas
 # -------------------------------------------------------
 Write-Host "[setup] Aceitando licencas Android..."
-"y`ny`ny`ny`ny`ny`ny`n" | & $sdkMgr --licenses 2>&1 | Out-Null
+$licenseInputPath = Join-Path $env:TEMP "codequest-android-licenses.txt"
+try {
+    Set-Content -LiteralPath $licenseInputPath -Value ("y`r`n" * 20) -NoNewline -Encoding ASCII
+    & cmd.exe /c "type `"$licenseInputPath`" | `"$sdkMgr`" --licenses >nul 2>nul"
+    if ($LASTEXITCODE -ne 0) {
+        throw "sdkmanager --licenses falhou com codigo de saida $LASTEXITCODE"
+    }
+}
+finally {
+    Remove-Item -LiteralPath $licenseInputPath -Force -ErrorAction SilentlyContinue
+}
 Write-Host "[setup] Licencas aceitas."
 
 # -------------------------------------------------------

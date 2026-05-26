@@ -25,7 +25,7 @@ $running = ($devices | Select-String "emulator.*device$").Count -gt 0
 
 if (-not $running) {
     Write-Host "[run-dev] Iniciando emulador $avdName..."
-    Start-Process $emulator -ArgumentList "-avd $avdName" -WindowStyle Normal
+    Start-Process $emulator -ArgumentList @("-avd", $avdName, "-gpu", "swiftshader_indirect", "-no-snapshot-load") -WindowStyle Normal
     Write-Host "[run-dev] Aguardando emulador inicializar (pode levar 1-2 minutos)..."
     & $adb wait-for-device
     # Aguarda o boot completo do Android
@@ -42,4 +42,4 @@ if (-not $running) {
 # 2. Rodar Flutter
 # -------------------------------------------------------
 Write-Host "[run-dev] Iniciando Flutter..."
-flutter run --dart-define=USE_EMULATOR=true
+flutter run --dart-define=USE_EMULATOR=true --no-enable-impeller

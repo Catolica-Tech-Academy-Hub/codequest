@@ -9,6 +9,7 @@ class RankingPage extends StatelessWidget {
       appBar: AppBar(title: const Text('Ranking')),
       body: ListView(
         children: const <Widget>[
+          _MockNotice(),
           ListTile(
             leading: CircleAvatar(child: Text('1')),
             title: Text('Dev User'),
@@ -28,6 +29,29 @@ class RankingPage extends StatelessWidget {
             trailing: Icon(Icons.arrow_downward, color: Colors.red),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _MockNotice extends StatelessWidget {
+  const _MockNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Card(
+      margin: EdgeInsets.all(16),
+      child: Padding(
+        padding: EdgeInsets.all(12),
+        child: Row(
+          children: <Widget>[
+            Icon(Icons.info_outline),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text('Mock: ranking fixo no front, ainda nao vem do Firestore.'),
+            ),
+          ],
+        ),
       ),
     );
   }

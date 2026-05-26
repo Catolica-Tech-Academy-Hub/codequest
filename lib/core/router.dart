@@ -56,7 +56,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/home/ranking',
-            builder: (BuildContext context, GoRouterState state) => const RankingPage(),
+            builder: (BuildContext context, GoRouterState state) => const RankingScreen(),
           ),
           GoRoute(
             path: '/home/profile',

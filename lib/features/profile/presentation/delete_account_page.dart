@@ -22,7 +22,6 @@ class _DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
     setState(() => _loading = true);
     try {
       await ref.read(profileControllerProvider).deleteAccount(uid: user.uid);
-      // GoRouter detecta a mudança de auth e navega para /login automaticamente
     } on AuthFailure catch (e) {
       _showError(e.message);
     } catch (_) {

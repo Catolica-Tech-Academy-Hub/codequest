@@ -1,10 +1,12 @@
 const admin = require('firebase-admin');
-const { onRequest } = require('firebase-functions/v2/https');
+const { onRequest, onCall } = require('firebase-functions/v2/https');
 const { createSampleModule } = require('./modules/sample');
+const { createUserModule } = require('./modules/user');
 
 admin.initializeApp();
 
 const sampleController = createSampleModule();
+const userController = createUserModule();
 
 exports.health = onRequest((request, response) => {
   response.status(200).json({
@@ -27,4 +29,13 @@ exports.sampleApi = onRequest(async (request, response) => {
 
   response.status(405).json({ message: 'Method not allowed' });
 });
+
+// RF04 / RF07 — Atualização de perfil (nome, bio)
+exports.updateUserProfile = onCall(userController.updateProfile);
+
+// RF16 — Preferências de notificação
+exports.updateUserNotifications = onCall(userController.updateNotifications);
+
+// RF08 — Exclusão de conta (atomicamente: Firestore + Auth)
+exports.deleteUserAccount = onCall(userController.deleteAccount);
 

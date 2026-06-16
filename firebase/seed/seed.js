@@ -47,6 +47,15 @@ const seedUsers = [
 
 const bronzeLeagueId = 'bronze-001';
 
+// Estado de gamificação por usuário, lido diretamente do documento `users/{uid}`
+// pelo ranking (xpTotal/streakDays/positionChange).
+const seedGamification = {
+  'admin-001': { xpTotal: 60, streakDays: 1, positionChange: 0 },
+  'dev-001': { xpTotal: 120, streakDays: 5, positionChange: 1 },
+  'dev-002': { xpTotal: 100, streakDays: 3, positionChange: 0 },
+  'dev-003': { xpTotal: 90, streakDays: 2, positionChange: -1 },
+};
+
 const trailId = 'flutter-basico';
 
 const trailLevels = [
@@ -152,22 +161,37 @@ async function seed() {
 
   for (const user of seedUsers) {
     await upsertUser(user);
+    const gamification = seedGamification[user.uid] || {
+      xpTotal: 0,
+      streakDays: 0,
+      positionChange: 0,
+    };
     await db.collection('users').doc(user.uid).set(
       {
         uid: user.uid,
         email: user.email,
         name: user.displayName,
+        displayName: user.displayName,
+        leagueId: bronzeLeagueId,
+        xpTotal: gamification.xpTotal,
+        streakDays: gamification.streakDays,
+        positionChange: gamification.positionChange,
         updatedAt: new Date().toISOString(),
       },
       { merge: true },
     );
   }
 
+  const leagueEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   await db.collection('leagues').doc(bronzeLeagueId).set(
     {
       id: bronzeLeagueId,
       name: 'Bronze',
-      tier: 1,
+      // Campos lidos pelo ranking (_LeagueDto): tier textual + janela da liga.
+      tier: 'bronze',
+      endsAt: leagueEndsAt,
+      promotionThreshold: 15,
+      totalParticipants: seedUsers.length,
       createdAt: new Date().toISOString(),
     },
     { merge: true },

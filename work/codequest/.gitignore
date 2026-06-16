@@ -1,0 +1,28 @@
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+*.g.dart
+*.freezed.dart
+
+# IDE
+.idea/
+*.iml
+.metadata
+
+# Firebase credentials
+google-services.json
+GoogleService-Info.plist
+
+# Firebase local infrastructure
+firebase/functions/node_modules/
+firebase/seed/node_modules/
+firebase/seed-data/
+
+# Env files
+.env
+.env.*
+
+# Firebase debug logs
+firebase/*-debug.log
+

@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "Dart-Code.flutter",
+    "Dart-Code.dart-code",
+    "ms-azuretools.vscode-docker",
+    "usernamehw.errorlens",
+    "aaron-bond.better-comments",
+    "PKief.material-icons-theme",
+    "eamodio.gitlens",
+    "bierner.markdown-mermaid",
+    "streetsidesoftware.code-spell-checker",
+    "streetsidesoftware.code-spell-checker-portuguese-brazilian",
+    "nash.awesome-flutter-snippets"
+  ]
+}

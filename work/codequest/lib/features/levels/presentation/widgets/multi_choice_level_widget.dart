@@ -1,0 +1,124 @@
+import 'package:codequest/features/levels/domain/entities/level.dart';
+import 'package:codequest/features/levels/domain/entities/level_completion_summary.dart';
+import 'package:codequest/features/levels/domain/entities/level_result.dart';
+import 'package:codequest/features/levels/domain/value_objects/answer_key.dart';
+import 'package:codequest/features/levels/presentation/widgets/answer_option_tile.dart';
+import 'package:codequest/features/levels/presentation/widgets/rich_level_text.dart';
+import 'package:codequest/features/levels/providers/level_providers.dart';
+import 'package:codequest/shared/widgets/feedback_modal.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class MultiChoiceLevelWidget extends ConsumerStatefulWidget {
+  const MultiChoiceLevelWidget({
+    required this.level,
+    required this.onCompleted,
+    super.key,
+  });
+
+  final MultiChoiceLevel level;
+  final ValueChanged<LevelCompletionSummary> onCompleted;
+
+  @override
+  ConsumerState<MultiChoiceLevelWidget> createState() =>
+      _MultiChoiceLevelWidgetState();
+}
+
+class _MultiChoiceLevelWidgetState
+    extends ConsumerState<MultiChoiceLevelWidget> {
+  final Set<AnswerKey> _selected = <AnswerKey>{};
+  LevelResult? _result;
+
+  void _toggle(AnswerKey key) {
+    if (_result != null) return;
+    setState(() {
+      if (_selected.contains(key)) {
+        _selected.remove(key);
+      } else {
+        _selected.add(key);
+      }
+    });
+  }
+
+  Future<void> _submit() async {
+    if (_selected.isEmpty) return;
+    final result = ref
+        .read(levelControllerProvider)
+        .evaluate(widget.level, Set<AnswerKey>.from(_selected));
+    setState(() => _result = result);
+
+    if (!mounted) return;
+    await showFeedbackModal(
+      context,
+      status: result.correct ? FeedbackStatus.correct : FeedbackStatus.wrong,
+      message: _messageFor(result),
+      onContinue: () {
+        final summary =
+            ref.read(levelControllerProvider).completionFromResult(result);
+        widget.onCompleted(summary);
+      },
+    );
+  }
+
+  String _messageFor(LevelResult result) {
+    if (result.correct) {
+      return 'Você completou o exercício corretamente!';
+    }
+    final expected = result.expected
+        .map((k) => widget.level.options[k] ?? k.value.toUpperCase())
+        .join(', ');
+    return 'A resposta correta era: $expected';
+  }
+
+  AnswerTileState _stateFor(AnswerKey key) {
+    final result = _result;
+    if (result == null) {
+      return _selected.contains(key)
+          ? AnswerTileState.selected
+          : AnswerTileState.idle;
+    }
+    final isExpected = result.expected.contains(key);
+    final isSelected = result.selected.contains(key);
+    if (isSelected && isExpected) return AnswerTileState.correct;
+    if (isSelected && !isExpected) return AnswerTileState.incorrect;
+    if (!isSelected && isExpected) return AnswerTileState.missed;
+    return AnswerTileState.idle;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final level = widget.level;
+    final entries = level.options.entries.toList()
+      ..sort((a, b) => a.key.value.compareTo(b.key.value));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        RichLevelText(
+          level.question,
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Selecione todas as respostas corretas.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        const SizedBox(height: 16),
+        for (final entry in entries)
+          AnswerOptionTile(
+            label: entry.key.value,
+            text: entry.value,
+            state: _stateFor(entry.key),
+            onTap: _result == null ? () => _toggle(entry.key) : null,
+          ),
+        const SizedBox(height: 16),
+        FilledButton(
+          onPressed: _selected.isEmpty || _result != null ? null : _submit,
+          child: const Text('Verificar'),
+        ),
+      ],
+    );
+  }
+}

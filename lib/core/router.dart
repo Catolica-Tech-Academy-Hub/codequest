@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:codequest/features/code_sorting/presentation/code_sorting_page.dart';
 import 'package:codequest/features/levels/presentation/level_page.dart';
 import 'package:codequest/features/auth/providers/auth_providers.dart';
 import 'package:codequest/features/auth/presentation/login_page.dart';
@@ -78,6 +79,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           return LevelPage(
             levelId: state.pathParameters['levelId'] ?? '',
             trailId: state.uri.queryParameters['trailId'],
+          );
+        },
+      ),
+      GoRoute(
+        path: '/challenge/code-sorting/:challengeId',
+        builder: (BuildContext context, GoRouterState state) {
+          return CodeSortingPage(
+            challengeId: state.pathParameters['challengeId'] ?? '',
+            userId: state.extra as String? ?? '',
           );
         },
       ),

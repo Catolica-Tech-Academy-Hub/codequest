@@ -1,0 +1,13 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "dart.lineLength": 100,
+  "dart.previewFlutterUiGuides": true,
+  "search.exclude": {
+    "**/.dart_tool": true,
+    "**/build": true
+  }
+}

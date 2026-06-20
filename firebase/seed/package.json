@@ -1,0 +1,12 @@
+{
+  "name": "codequest-seed",
+  "private": true,
+  "main": "seed.js",
+  "engines": {
+    "node": "18"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}
+

@@ -1,0 +1,73 @@
+{
+  "level_0": {
+    "type": "content",
+    "title": "Variáveis em Dart",
+    "body": "Em Dart você declara variáveis com três palavras-chave principais: <code>var</code>, <code>final</code> e <code>const</code>.\n\n- <code>var</code>: tipo inferido, valor pode mudar.\n- <code>final</code>: valor atribuído <b>uma única vez</b>, em runtime.\n- <code>const</code>: constante em <i>tempo de compilação</i>, valor imutável.\n\nExemplo:\n<pre><code>var name = 'Dart';\nfinal pi = 3.14;\nconst maxLength = 10;</code></pre>\nDica: prefira <code>final</code> sempre que o valor não precisar mudar — torna o código mais previsível."
+  },
+  "level_1": {
+    "type": "one-choice",
+    "question": "Qual operador testa <b>igualdade de valor</b> em Dart?",
+    "answers": {
+      "a": "<code>=</code>",
+      "b": "<code>==</code>",
+      "c": "<code>===</code>",
+      "d": "<code>eq</code>"
+    },
+    "correct_answer": "b"
+  },
+  "level_2": {
+    "type": "multi-choice",
+    "question": "Quais destes são <b>tipos numéricos</b> primitivos em Dart?",
+    "answers": {
+      "a": "<code>int</code>",
+      "b": "<code>String</code>",
+      "c": "<code>double</code>",
+      "d": "<code>bool</code>"
+    },
+    "correct_answers": ["a", "c"]
+  },
+  "level_3": {
+    "type": "one-choice",
+    "question": "Qual palavra-chave declara uma <i>constante em tempo de compilação</i>?",
+    "answers": {
+      "a": "<code>final</code>",
+      "b": "<code>var</code>",
+      "c": "<code>const</code>",
+      "d": "<code>static</code>"
+    },
+    "correct_answer": "c"
+  },
+  "level_4": {
+    "type": "one-choice",
+    "question": "Qual widget organiza filhos em uma <b>coluna vertical</b> no Flutter?",
+    "answers": {
+      "a": "<code>Row</code>",
+      "b": "<code>Stack</code>",
+      "c": "<code>Column</code>",
+      "d": "<code>ListView</code>"
+    },
+    "correct_answer": "c"
+  },
+  "level_5": {
+    "type": "multi-choice",
+    "question": "Quais destes são widgets de <b>scroll</b> no Flutter?",
+    "answers": {
+      "a": "<code>ListView</code>",
+      "b": "<code>Container</code>",
+      "c": "<code>SingleChildScrollView</code>",
+      "d": "<code>SizedBox</code>"
+    },
+    "correct_answers": ["a", "c"]
+  },
+  "level_6": {
+    "type": "one-choice",
+    "question": "Qual método é chamado para <i>reconstruir</i> um <code>StatefulWidget</code>?",
+    "answers": {
+      "a": "<code>build()</code>",
+      "b": "<code>setState()</code>",
+      "c": "<code>initState()</code>",
+      "d": "<code>dispose()</code>"
+    },
+    "correct_answer": "b"
+  }
+}

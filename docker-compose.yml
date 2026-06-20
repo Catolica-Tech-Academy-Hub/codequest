@@ -1,0 +1,57 @@
+services:
+  firebase-emulators:
+    build:
+      context: .
+      dockerfile: Dockerfile.emulators
+    container_name: codequest-firebase-emulators
+    working_dir: /workspace/firebase
+    command: >
+      sh -c "
+      npm --prefix functions install &&
+      firebase emulators:start
+      --project ${FIREBASE_PROJECT_ID:-codequest-local}
+      --config /workspace/firebase/firebase.json
+      --only auth,firestore,functions,pubsub
+      --import=/workspace/firebase/seed-data
+      --export-on-exit=/workspace/firebase/seed-data
+      "
+    ports:
+      - "${FIREBASE_EMULATOR_UI_PORT:-4000}:4000"
+      - "${FIRESTORE_EMULATOR_PORT:-8080}:8080"
+      - "${FIREBASE_AUTH_EMULATOR_PORT:-9099}:9099"
+      - "${FIREBASE_FUNCTIONS_EMULATOR_PORT:-5001}:5001"
+      - "${FIREBASE_MESSAGING_EMULATOR_PORT:-9150}:9150"
+    volumes:
+      - ./firebase:/workspace/firebase
+      - emulator-data:/workspace/firebase/seed-data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+    restart: unless-stopped
+
+  seed-runner:
+    image: node:18-slim
+    container_name: codequest-seed-runner
+    depends_on:
+      firebase-emulators:
+        condition: service_healthy
+    working_dir: /workspace/seed
+    command: >
+      sh -c "
+      npm install &&
+      node seed.js
+      "
+    environment:
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-codequest-local}
+      FIRESTORE_EMULATOR_HOST: firebase-emulators:8080
+      FIREBASE_AUTH_EMULATOR_HOST: firebase-emulators:9099
+    volumes:
+      - ./firebase/seed:/workspace/seed
+    restart: "no"
+
+volumes:
+  emulator-data:
+

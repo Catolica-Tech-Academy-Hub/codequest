@@ -11,15 +11,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 Future<void> triggerAchievementsCheck(WidgetRef ref, BuildContext context) async {
   try {
     final unlocked = await ref.read(checkAchievementsActionProvider).call();
-    debugPrint('[achievements] check -> ${unlocked.map((a) => a.id).toList()}');
     for (final achievement in unlocked) {
       if (!context.mounted) {
         return;
       }
       await showAchievementUnlockedDialog(context, achievement);
     }
-  } catch (error, stack) {
-    debugPrint('[achievements] check FAILED: $error\n$stack');
+  } catch (_) {
     // Silencioso por design (ver doc acima).
   }
 }

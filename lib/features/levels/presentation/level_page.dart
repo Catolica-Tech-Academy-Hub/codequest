@@ -1,3 +1,4 @@
+import 'package:codequest/features/achievements/presentation/achievements_feedback.dart';
 import 'package:codequest/features/levels/presentation/level_builder.dart';
 import 'package:codequest/features/levels/providers/level_providers.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +37,14 @@ class LevelPage extends ConsumerWidget {
             data: (level) => SingleChildScrollView(
               child: LevelBuilder(
                 level: level,
-                onContinue: () => _continue(context),
+                onContinue: () async {
+                  // Concluir uma fase: verifica conquistas (e exibe o modal de
+                  // desbloqueio) antes de seguir.
+                  await triggerAchievementsCheck(ref, context);
+                  if (context.mounted) {
+                    _continue(context);
+                  }
+                },
               ),
             ),
             loading: () => const Center(child: CircularProgressIndicator()),

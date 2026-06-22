@@ -12,6 +12,7 @@ import 'package:codequest/features/trails/presentation/trails_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:codequest/screens/notification_settings_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   // HOTFIX: mantém o authStateProvider vivo para o ref.read dentro do redirect enxergar AsyncData em vez de loading
@@ -79,6 +80,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             levelId: state.pathParameters['levelId'] ?? '',
             trailId: state.uri.queryParameters['trailId'],
           );
+        },
+      ),
+      GoRoute(
+        path: '/notification-settings',
+        builder: (BuildContext context, GoRouterState state) {
+          return const AppShell();
         },
       ),
     ],

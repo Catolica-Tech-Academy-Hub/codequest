@@ -133,7 +133,6 @@ class _RankingBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final rankingAsync = ref.watch(leagueRankingStreamProvider(leagueId));
     final leagueAsync = ref.watch(leagueInfoStreamProvider(leagueId));
-    final myEntryAsync = ref.watch(currentUserRankingEntryProvider(leagueId));
 
     return Column(
       children: [
@@ -194,11 +193,15 @@ class _RankingBody extends ConsumerWidget {
         ),
 
         // Card de desempenho do aluno — fixo na parte inferior, stream em tempo real
-        myEntryAsync.when(
+        rankingAsync.when(
           loading: () => const SizedBox.shrink(),
           error: (_, __) => const SizedBox.shrink(),
-          data: (entry) =>
-          entry != null ? MyPerformanceCard(entry: entry) : const SizedBox.shrink(),
+          data: (entries) {
+            final myEntry = entries.where((e) => e.isCurrentUser).firstOrNull;
+            return myEntry != null
+                ? MyPerformanceCard(entry: myEntry)
+                : const SizedBox.shrink();
+          },
         ),
       ],
     );

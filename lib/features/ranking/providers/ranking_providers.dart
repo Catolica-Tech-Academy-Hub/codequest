@@ -1,90 +1,110 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../data/ranking_repository.dart';
 import '../domain/league_info.dart';
 import '../domain/ranking_entry.dart';
-import '../domain/ranking_repository_contract.dart';
 
 part 'ranking_providers.g.dart';
 
-// ---------------------------------------------------------------------------
-// Infraestrutura
-// ---------------------------------------------------------------------------
+const _mockUserId = 'mock-user-id';
+const _mockLeagueId = 'league-gold-001';
 
-/// Fornece a instância do [RankingRepositoryContract].
-///
-/// Usando [Provider] simples para que o repositório seja compartilhado
-/// sem recriações desnecessárias (cache automático do Riverpod).
-@riverpod
-RankingRepositoryContract rankingRepository(Ref ref) {
-  return RankingRepository(
-    firestore: FirebaseFirestore.instance,
-  );
-}
+final _mockEntries = [
+  RankingEntry(
+    userId: 'user-001',
+    displayName: 'Luna Star',
+    xpTotal: 2850,
+    position: 1,
+    streakDays: 15,
+    leagueId: _mockLeagueId,
+    positionChange: 2,
+  ),
+  RankingEntry(
+    userId: 'user-002',
+    displayName: 'Max Power',
+    xpTotal: 2420,
+    position: 2,
+    streakDays: 12,
+    leagueId: _mockLeagueId,
+    positionChange: -1,
+  ),
+  RankingEntry(
+    userId: 'user-003',
+    displayName: 'Pixel Ninja',
+    xpTotal: 2100,
+    position: 3,
+    streakDays: 20,
+    leagueId: _mockLeagueId,
+    positionChange: 0,
+  ),
+  RankingEntry(
+    userId: _mockUserId,
+    displayName: 'Você',
+    xpTotal: 1890,
+    position: 4,
+    streakDays: 8,
+    leagueId: _mockLeagueId,
+    isCurrentUser: true,
+    positionChange: 1,
+  ),
+  RankingEntry(
+    userId: 'user-005',
+    displayName: 'Byte Queen',
+    xpTotal: 1650,
+    position: 5,
+    streakDays: 10,
+    leagueId: _mockLeagueId,
+    positionChange: -2,
+  ),
+  RankingEntry(
+    userId: 'user-006',
+    displayName: 'Code Wizard',
+    xpTotal: 1430,
+    position: 6,
+    streakDays: 6,
+    leagueId: _mockLeagueId,
+    positionChange: 3,
+  ),
+  RankingEntry(
+    userId: 'user-007',
+    displayName: 'Data Fox',
+    xpTotal: 1280,
+    position: 7,
+    streakDays: 9,
+    leagueId: _mockLeagueId,
+    positionChange: 0,
+  ),
+  RankingEntry(
+    userId: 'user-008',
+    displayName: 'Shell Ghost',
+    xpTotal: 990,
+    position: 8,
+    streakDays: 4,
+    leagueId: _mockLeagueId,
+    positionChange: -1,
+  ),
+];
 
-// ---------------------------------------------------------------------------
-// Estado: leagueId do usuário logado
-// ---------------------------------------------------------------------------
+final _mockLeagueInfo = LeagueInfo(
+  leagueId: _mockLeagueId,
+  tier: LeagueTier.gold,
+  endsAt: DateTime.now().add(const Duration(days: 5, hours: 14)),
+  promotionThreshold: 5,
+  totalParticipants: 8,
+);
 
-/// Carrega e armazena o leagueId do aluno logado.
-///
-/// Leitura única ao montar a tela — não consome cota repetidamente.
-/// O StreamBuilder da UI usa os providers de stream abaixo, que são
-/// eficientes por natureza (SDK Firestore com cache offline).
 @riverpod
 Future<String?> currentUserLeagueId(Ref ref) async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return null;
-
-  final repo = ref.watch(rankingRepositoryProvider);
-  return repo.fetchUserLeagueId(userId: user.uid);
+  return _mockLeagueId;
 }
 
-// ---------------------------------------------------------------------------
-// Streams em tempo real
-// ---------------------------------------------------------------------------
-
-/// Stream do ranking da liga em tempo real.
-///
-/// Recebe [leagueId] como parâmetro para que o provider seja family-cached
-/// por liga — evitando recriação se múltiplas telas observarem a mesma liga.
 @riverpod
-Stream<List<RankingEntry>> leagueRankingStream(
-    Ref ref,
-    String leagueId,
-    ) {
-  final user = FirebaseAuth.instance.currentUser;
-  final repo = ref.watch(rankingRepositoryProvider);
-
-  return repo.watchLeagueRanking(
-    leagueId: leagueId,
-    currentUserId: user?.uid ?? '',
-  );
+Stream<List<RankingEntry>> leagueRankingStream(Ref ref, String leagueId) {
+  return Stream.value(_mockEntries);
 }
 
-/// Stream dos dados da liga em tempo real.
 @riverpod
 Stream<LeagueInfo> leagueInfoStream(Ref ref, String leagueId) {
-  final repo = ref.watch(rankingRepositoryProvider);
-  return repo.watchLeagueInfo(leagueId: leagueId);
-}
-
-// ---------------------------------------------------------------------------
-// Estado derivado: entrada do usuário logado no ranking
-// ---------------------------------------------------------------------------
-
-/// Deriva a posição atual do usuário logado a partir do stream do ranking.
-///
-/// Evita consulta separada ao Firestore — resolve em memória.
-@riverpod
-Stream<RankingEntry?> currentUserRankingEntry(
-    Ref ref,
-    String leagueId,
-    ) {
-  return ref.watch(leagueRankingStreamProvider(leagueId).stream).map(
-        (entries) => entries.where((e) => e.isCurrentUser).firstOrNull,
-  );
+  return Stream.value(_mockLeagueInfo);
 }

@@ -16,7 +16,7 @@ class TrailDetailPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(state.valueOrNull?.title ?? 'Trilha'),
+        title: Text(state.asData?.value.title ?? 'Trilha'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           tooltip: 'Voltar',

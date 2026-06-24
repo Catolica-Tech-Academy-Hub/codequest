@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:codequest/features/achievements/presentation/achievements_page.dart';
+import 'package:codequest/features/code_sorting/presentation/code_sorting_page.dart';
 import 'package:codequest/features/levels/presentation/level_page.dart';
 import 'package:codequest/features/auth/providers/auth_providers.dart';
 import 'package:codequest/features/auth/presentation/login_page.dart';
@@ -13,6 +14,7 @@ import 'package:codequest/features/trails/presentation/trails_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:codequest/screens/notification_settings_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   // HOTFIX: mantém o authStateProvider vivo para o ref.read dentro do redirect enxergar AsyncData em vez de loading
@@ -86,6 +88,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
+GoRoute(
+  path: '/notification-settings',
+  builder: (BuildContext context, GoRouterState state) {
+    return const AppShell();
+  },
+),
+GoRoute(
+  path: '/challenge/code-sorting/:challengeId',
+  builder: (BuildContext context, GoRouterState state) {
+    return CodeSortingPage(
+      challengeId: state.pathParameters['challengeId'] ?? '',
+      userId: state.extra as String? ?? '',
+    );
+  },
+),
     ],
     redirect: (BuildContext context, GoRouterState state) {
       final authState = ref.read(authStateProvider);

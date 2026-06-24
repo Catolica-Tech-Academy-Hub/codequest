@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/ranking_repository.dart';
-import '../domain/league_info.dart';
-import '../domain/ranking_entry.dart';
-import '../domain/ranking_repository_contract.dart';
+import 'package:codequest/features/ranking/data/ranking_repository.dart';
+import 'package:codequest/features/ranking/domain/league_info.dart';
+import 'package:codequest/features/ranking/domain/ranking_entry.dart';
+import 'package:codequest/features/ranking/domain/ranking_repository_contract.dart';
 
 // ---------------------------------------------------------------------------
 // Infraestrutura
@@ -33,7 +33,6 @@ final rankingRepositoryProvider = Provider<RankingRepositoryContract>((ref) {
 final currentUserLeagueIdProvider = FutureProvider<String?>((ref) async {
   final user = FirebaseAuth.instance.currentUser;
   if (user == null) return null;
-
   final repo = ref.watch(rankingRepositoryProvider);
   return repo.fetchUserLeagueId(userId: user.uid);
 });
@@ -50,7 +49,6 @@ final leagueRankingStreamProvider =
     StreamProvider.family<List<RankingEntry>, String>((ref, leagueId) {
   final user = FirebaseAuth.instance.currentUser;
   final repo = ref.watch(rankingRepositoryProvider);
-
   return repo.watchLeagueRanking(
     leagueId: leagueId,
     currentUserId: user?.uid ?? '',

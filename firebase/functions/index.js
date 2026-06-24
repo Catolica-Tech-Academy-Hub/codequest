@@ -1,8 +1,10 @@
 const admin = require('firebase-admin');
 const { onRequest } = require('firebase-functions/v2/https');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
+const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { createSampleModule } = require('./modules/sample');
 const { processLeagueCycle } = require('./modules/leagues');
+const { processMailDocument, sendWelcomeEmail } = require('./modules/notifications');
 
 admin.initializeApp();
 
@@ -37,4 +39,18 @@ exports.sampleApi = onRequest(async (request, response) => {
 exports.weeklyLeagueCycle = onSchedule("59 23 * * 0", async (event) => {
   console.log("Iniciando rotina semanal do sistema de ligas...");
   await processLeagueCycle();
+});
+
+// Firestore Trigger - Processa envio de e-mail ao criar documento em `mail`
+exports.onMailCreated = onDocumentCreated("mail/{mailId}", async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  await processMailDocument(snapshot);
+});
+
+// Firestore Trigger - Envia e-mail de boas-vindas ao criar novo usuário
+exports.onUserCreated = onDocumentCreated("users/{userId}", async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  await sendWelcomeEmail(event.params.userId);
 });

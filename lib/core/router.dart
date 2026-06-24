@@ -6,6 +6,8 @@ import 'package:codequest/features/auth/providers/auth_providers.dart';
 import 'package:codequest/features/auth/presentation/login_page.dart';
 import 'package:codequest/features/auth/presentation/register_page.dart';
 import 'package:codequest/features/home/presentation/home_page.dart';
+import 'package:codequest/features/notifications/presentation/notification_initializer.dart';
+import 'package:codequest/features/notifications/presentation/notification_settings_page.dart';
 import 'package:codequest/features/profile/presentation/profile_page.dart';
 import 'package:codequest/features/ranking/presentation/ranking_page.dart';
 import 'package:codequest/features/trails/presentation/trail_detail_page.dart';
@@ -48,7 +50,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       ShellRoute(
         builder: (BuildContext context, GoRouterState state, Widget child) {
-          return HomePage(child: child);
+          return NotificationInitializer(
+            child: HomePage(child: child),
+          );
         },
         routes: <RouteBase>[
           GoRoute(
@@ -89,6 +93,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             challengeId: state.pathParameters['challengeId'] ?? '',
             userId: state.extra as String? ?? '',
           );
+        },
+      ),
+      GoRoute(
+        path: '/settings/notifications',
+        builder: (BuildContext context, GoRouterState state) {
+          return const NotificationSettingsPage();
         },
       ),
     ],

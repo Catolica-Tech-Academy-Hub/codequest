@@ -27,6 +27,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /mail/{mailId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

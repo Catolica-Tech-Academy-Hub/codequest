@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../domain/league_info.dart';
+import 'package:codequest/features/ranking/domain/league_info.dart';
 
 /// Cabeçalho gamificado com dados da liga ativa.
 ///

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../domain/ranking_entry.dart';
+import 'package:codequest/features/ranking/domain/ranking_entry.dart';
 
 /// Exibe o desempenho resumido do aluno logado fixado na parte inferior.
 ///

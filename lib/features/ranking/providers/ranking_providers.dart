@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../domain/league_info.dart';
-import '../domain/ranking_entry.dart';
+import 'package:codequest/features/ranking/domain/league_info.dart';
+import 'package:codequest/features/ranking/domain/ranking_entry.dart';
 
 part 'ranking_providers.g.dart';
 

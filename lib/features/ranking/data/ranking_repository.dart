@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../domain/league_info.dart';
-import '../domain/ranking_entry.dart';
-import '../domain/ranking_repository_contract.dart';
+import 'package:codequest/features/ranking/domain/league_info.dart';
+import 'package:codequest/features/ranking/domain/ranking_entry.dart';
+import 'package:codequest/features/ranking/domain/ranking_repository_contract.dart';
 
 // ---------------------------------------------------------------------------
 // DTOs

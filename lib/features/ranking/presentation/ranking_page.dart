@@ -60,12 +60,11 @@ class _MockNotice extends StatelessWidget {
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../providers/ranking_providers.dart';
-import 'widgets/league_header.dart';
-import 'widgets/my_performance_card.dart';
-import 'widgets/ranking_list_item.dart';
-import 'widgets/ranking_podium.dart';
+import 'package:codequest/features/ranking/providers/ranking_providers.dart';
+import 'package:codequest/features/ranking/presentation/widgets/league_header.dart';
+import 'package:codequest/features/ranking/presentation/widgets/my_performance_card.dart';
+import 'package:codequest/features/ranking/presentation/widgets/ranking_list_item.dart';
+import 'package:codequest/features/ranking/presentation/widgets/ranking_podium.dart';
 
 /// Tela principal de ranking gamificado.
 ///

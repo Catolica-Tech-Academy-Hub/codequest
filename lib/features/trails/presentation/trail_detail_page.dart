@@ -13,6 +13,10 @@ class TrailDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(trailByIdProvider(trailId));
+    final progressState = ref.watch(userTrailProgressProvider(trailId));
+    
+    // Se o progresso ainda não carregou, não sabemos quais níveis liberar (padrão index 0)
+    final highestUnlockedIndex = progressState.valueOrNull?.highestUnlockedLevelIndex ?? 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -40,6 +44,7 @@ class TrailDetailPage extends ConsumerWidget {
               LevelNode(
                 index: i + 1,
                 alignment: Alignment.center,
+                isLocked: i > highestUnlockedIndex,
                 onTap: () => context.go(
                   '/level/${trail.levelIds[i]}?trailId=${trail.id}',
                 ),
@@ -47,6 +52,7 @@ class TrailDetailPage extends ConsumerWidget {
             LevelNode(
               index: 8,
               alignment: Alignment.center,
+              isLocked: (trail.levelIds.length - 1) > highestUnlockedIndex,
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => const CodeSortingPreviewPage(),

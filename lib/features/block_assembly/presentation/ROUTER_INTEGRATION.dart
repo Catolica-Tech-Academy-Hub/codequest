@@ -2,7 +2,6 @@
 // 
 // Adicione este trecho ao seu lib/core/router.dart
 
-import 'package:go_router/go_router.dart';
 
 // Importar a página:
 // import 'package:codequest/features/block_assembly/presentation/block_assembly_page.dart';

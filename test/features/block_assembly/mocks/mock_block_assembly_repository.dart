@@ -37,7 +37,7 @@ class MockBlockAssemblyRepository implements BlockAssemblyRepositoryContract {
     required String userId,
     required String challengeId,
   }) async {
-    final key = '${userId}_${challengeId}';
+    final key = '${userId}_$challengeId';
     return _attempts[key] ?? [];
   }
 
@@ -46,7 +46,7 @@ class MockBlockAssemblyRepository implements BlockAssemblyRepositoryContract {
     required String userId,
     required String challengeId,
   }) async {
-    final key = '${userId}_${challengeId}';
+    final key = '${userId}_$challengeId';
     return _progress[key];
   }
 
@@ -61,7 +61,7 @@ class MockBlockAssemblyRepository implements BlockAssemblyRepositoryContract {
     required String userId,
     required String challengeId,
   }) {
-    final key = '${userId}_${challengeId}';
+    final key = '${userId}_$challengeId';
     final progress = _progressStream[key];
     if (progress != null) {
       return Stream.value(progress);

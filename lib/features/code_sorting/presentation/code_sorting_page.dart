@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../domain/entities/code_sorting_challenge.dart';
-import '../domain/value_objects/line_id.dart';
-import '../providers/code_sorting_providers.dart';
-import 'controllers/sorting_board_controller.dart';
-import 'widgets/sortable_code_line.dart';
-import 'widgets/sorting_feedback_widgets.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_sorting_challenge.dart';
+import 'package:codequest/features/code_sorting/domain/value_objects/line_id.dart';
+import 'package:codequest/features/code_sorting/providers/code_sorting_providers.dart';
+import 'package:codequest/features/code_sorting/presentation/controllers/sorting_board_controller.dart';
+import 'package:codequest/features/code_sorting/presentation/widgets/sortable_code_line.dart';
+import 'package:codequest/features/code_sorting/presentation/widgets/sorting_feedback_widgets.dart';
 
 /// Tela principal do desafio de ordenação de linhas de código.
 ///
@@ -106,7 +106,7 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
     final boardState = ref.watch(sortingBoardProvider);
     final progressAsync = ref.watch(userSortingProgressProvider(
       (userId: widget.userId, challengeId: widget.challenge.id),
-    ));
+    ),);
     final submitUseCase = ref.watch(submitSortingAttemptUseCaseProvider);
 
     // Ordem correta para calcular progresso visual

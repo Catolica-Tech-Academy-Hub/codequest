@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../domain/entities/assembly_attempt.dart';
-import '../../domain/entities/assembly_challenge.dart';
-import '../../domain/entities/user_challenge_progress.dart';
-import '../../domain/errors/block_assembly_error.dart';
-import '../../domain/repositories/block_assembly_repository_contract.dart';
-import '../dtos/assembly_attempt_dto.dart';
-import '../dtos/assembly_challenge_dto.dart';
-import '../dtos/user_challenge_progress_dto.dart';
+import 'package:codequest/features/block_assembly/domain/entities/assembly_attempt.dart';
+import 'package:codequest/features/block_assembly/domain/entities/assembly_challenge.dart';
+import 'package:codequest/features/block_assembly/domain/entities/user_challenge_progress.dart';
+import 'package:codequest/features/block_assembly/domain/errors/block_assembly_error.dart';
+import 'package:codequest/features/block_assembly/domain/repositories/block_assembly_repository_contract.dart';
+import 'package:codequest/features/block_assembly/data/dtos/assembly_attempt_dto.dart';
+import 'package:codequest/features/block_assembly/data/dtos/assembly_challenge_dto.dart';
+import 'package:codequest/features/block_assembly/data/dtos/user_challenge_progress_dto.dart';
 
 /// Implementação concreta do [BlockAssemblyRepositoryContract] usando Cloud Firestore.
 ///
@@ -63,7 +63,7 @@ class BlockAssemblyRepository implements BlockAssemblyRepositoryContract {
       return query.docs
           .map((doc) => AssemblyChallengeDto.fromFirestore(
                 doc.data(),
-              ).toDomain())
+              ).toDomain(),)
           .toList();
     } catch (e) {
       throw RepositoryError('Erro ao recuperar desafios: $e');
@@ -115,7 +115,7 @@ class BlockAssemblyRepository implements BlockAssemblyRepositoryContract {
       return query.docs
           .map((doc) => AssemblyAttemptDto.fromFirestore(
                 doc.data(),
-              ).toDomain())
+              ).toDomain(),)
           .toList();
     } catch (e) {
       throw RepositoryError(

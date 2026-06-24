@@ -1,11 +1,11 @@
 import 'package:uuid/uuid.dart';
 
-import '../../domain/entities/code_sorting_challenge.dart';
-import '../../domain/entities/sorting_attempt.dart';
-import '../../domain/entities/user_sorting_progress.dart';
-import '../../domain/repositories/code_sorting_repository_contract.dart';
-import '../../domain/value_objects/line_id.dart';
-import 'validate_sorting_use_case.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_sorting_challenge.dart';
+import 'package:codequest/features/code_sorting/domain/entities/sorting_attempt.dart';
+import 'package:codequest/features/code_sorting/domain/entities/user_sorting_progress.dart';
+import 'package:codequest/features/code_sorting/domain/repositories/code_sorting_repository_contract.dart';
+import 'package:codequest/features/code_sorting/domain/value_objects/line_id.dart';
+import 'package:codequest/features/code_sorting/application/actions/validate_sorting_use_case.dart';
 
 /// Orquestra a submissão de uma tentativa de ordenação.
 ///

@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../domain/entities/code_sorting_challenge.dart';
-import '../../domain/entities/sorting_attempt.dart';
-import '../../domain/entities/user_sorting_progress.dart';
-import '../../domain/errors/code_sorting_error.dart';
-import '../../domain/repositories/code_sorting_repository_contract.dart';
-import '../dtos/code_sorting_challenge_dto.dart';
-import '../dtos/sorting_attempt_dto.dart';
-import '../dtos/user_sorting_progress_dto.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_sorting_challenge.dart';
+import 'package:codequest/features/code_sorting/domain/entities/sorting_attempt.dart';
+import 'package:codequest/features/code_sorting/domain/entities/user_sorting_progress.dart';
+import 'package:codequest/features/code_sorting/domain/errors/code_sorting_error.dart';
+import 'package:codequest/features/code_sorting/domain/repositories/code_sorting_repository_contract.dart';
+import 'package:codequest/features/code_sorting/data/dtos/code_sorting_challenge_dto.dart';
+import 'package:codequest/features/code_sorting/data/dtos/sorting_attempt_dto.dart';
+import 'package:codequest/features/code_sorting/data/dtos/user_sorting_progress_dto.dart';
 
 /// Implementação Firestore do [CodeSortingRepositoryContract].
 ///
@@ -54,7 +54,7 @@ class CodeSortingRepository implements CodeSortingRepositoryContract {
       return query.docs
           .map((doc) => CodeSortingChallengeDto.fromFirestore(
                 {'id': doc.id, ...doc.data()},
-              ).toDomain())
+              ).toDomain(),)
           .toList();
     } catch (e) {
       throw RepositoryError('Erro ao listar desafios: $e');
@@ -98,7 +98,7 @@ class CodeSortingRepository implements CodeSortingRepositoryContract {
           .get();
       return query.docs
           .map((doc) =>
-              SortingAttemptDto.fromFirestore(doc.data()).toDomain())
+              SortingAttemptDto.fromFirestore(doc.data()).toDomain(),)
           .toList();
     } catch (e) {
       throw RepositoryError('Erro ao recuperar histórico: $e');

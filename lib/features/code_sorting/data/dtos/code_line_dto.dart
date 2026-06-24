@@ -1,5 +1,5 @@
-import '../../domain/entities/code_line.dart';
-import '../../domain/value_objects/line_id.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_line.dart';
+import 'package:codequest/features/code_sorting/domain/value_objects/line_id.dart';
 
 class CodeLineDto {
   const CodeLineDto({

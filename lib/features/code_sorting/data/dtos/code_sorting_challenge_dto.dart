@@ -1,5 +1,5 @@
-import '../../domain/entities/code_sorting_challenge.dart';
-import 'code_line_dto.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_sorting_challenge.dart';
+import 'package:codequest/features/code_sorting/data/dtos/code_line_dto.dart';
 
 class CodeSortingChallengeDto {
   const CodeSortingChallengeDto({

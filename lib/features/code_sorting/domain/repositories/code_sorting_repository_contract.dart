@@ -1,6 +1,6 @@
-import '../entities/code_sorting_challenge.dart';
-import '../entities/sorting_attempt.dart';
-import '../entities/user_sorting_progress.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_sorting_challenge.dart';
+import 'package:codequest/features/code_sorting/domain/entities/sorting_attempt.dart';
+import 'package:codequest/features/code_sorting/domain/entities/user_sorting_progress.dart';
 
 /// Contrato do repositório de ordenação de código.
 ///

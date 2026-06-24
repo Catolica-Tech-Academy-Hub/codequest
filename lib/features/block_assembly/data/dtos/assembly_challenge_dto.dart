@@ -1,5 +1,5 @@
-import '../../domain/entities/assembly_challenge.dart';
-import 'logic_block_dto.dart';
+import 'package:codequest/features/block_assembly/domain/entities/assembly_challenge.dart';
+import 'package:codequest/features/block_assembly/data/dtos/logic_block_dto.dart';
 
 /// DTO que mapeia um desafio de montagem do Firestore para entidade de domínio.
 ///

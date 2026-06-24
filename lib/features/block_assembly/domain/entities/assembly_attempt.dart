@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../value_objects/block_id.dart';
+import 'package:codequest/features/block_assembly/domain/value_objects/block_id.dart';
 
 /// Entidade que registra uma tentativa do usuário de montar blocos.
 ///

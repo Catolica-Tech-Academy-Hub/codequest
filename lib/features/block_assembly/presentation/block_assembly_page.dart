@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain/entities/assembly_challenge.dart';
-import '../../domain/entities/logic_block.dart';
-import '../../domain/value_objects/block_id.dart';
-import '../controllers/assembly_board_controller.dart';
-import '../widgets/draggable_logic_block.dart';
-import '../widgets/drop_zone.dart';
-import '../widgets/feedback_widgets.dart';
-import '../../providers/block_assembly_providers.dart';
+import 'package:codequest/features/domain/entities/assembly_challenge.dart';
+import 'package:codequest/features/domain/entities/logic_block.dart';
+import 'package:codequest/features/domain/value_objects/block_id.dart';
+import 'package:codequest/features/block_assembly/controllers/assembly_board_controller.dart';
+import 'package:codequest/features/block_assembly/widgets/draggable_logic_block.dart';
+import 'package:codequest/features/block_assembly/widgets/drop_zone.dart';
+import 'package:codequest/features/block_assembly/widgets/feedback_widgets.dart';
+import 'package:codequest/features/providers/block_assembly_providers.dart';
 
 /// Tela principal do desafio de montagem lógica por blocos.
 ///
@@ -176,7 +176,7 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
           _BlocksSource(
             blocks: widget.challenge.blocks,
             selectedIds: {
-              for (final b in boardState.selectedSequence) b.id.value
+              for (final b in boardState.selectedSequence) b.id.value,
             },
           ),
           const SizedBox(height: 32),

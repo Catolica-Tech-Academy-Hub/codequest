@@ -1,3 +1,4 @@
+import 'package:codequest/features/code_sorting/presentation/code_sorting_preview_page.dart';
 import 'package:codequest/features/trails/presentation/widgets/level_node.dart';
 import 'package:codequest/features/trails/providers/trail_providers.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,7 @@ class TrailDetailPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            for (var i = 0; i < trail.levelIds.length; i++)
+            for (var i = 0; i < trail.levelIds.length - 1; i++)
               LevelNode(
                 index: i + 1,
                 alignment: Alignment.center,
@@ -43,6 +44,15 @@ class TrailDetailPage extends ConsumerWidget {
                   '/level/${trail.levelIds[i]}?trailId=${trail.id}',
                 ),
               ),
+            LevelNode(
+              index: 8,
+              alignment: Alignment.center,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const CodeSortingPreviewPage(),
+                ),
+              ),
+            ),
           ],
         ),
         loading: () => const Center(child: CircularProgressIndicator()),

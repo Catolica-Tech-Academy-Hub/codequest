@@ -344,7 +344,7 @@ class _ShimmerBlockState extends State<_ShimmerBlock>
       builder: (_, __) => Container(
         height: widget.height,
         decoration: BoxDecoration(
-          color: Color.lerp(base, base.withOpacity(0.3), _anim.value),
+          color: Color.lerp(base, base.withAlpha((0.3 * 255).round()), _anim.value),
           borderRadius: BorderRadius.circular(16),
         ),
       ),

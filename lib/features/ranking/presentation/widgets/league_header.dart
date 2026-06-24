@@ -28,7 +28,7 @@ class LeagueHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: _tierGradient(leagueInfo.tier).first.withOpacity(0.4),
+            color: _tierGradient(leagueInfo.tier).first.withAlpha((0.4 * 255).round()),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),

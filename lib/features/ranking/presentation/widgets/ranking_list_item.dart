@@ -25,19 +25,19 @@ class RankingListItem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
         color: isCurrentUser
-            ? colorScheme.primaryContainer.withOpacity(0.35)
-            : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            ? colorScheme.primaryContainer.withAlpha((0.35 * 255).round())
+            : colorScheme.surfaceContainerHighest.withAlpha((0.5 * 255).round()),
         borderRadius: BorderRadius.circular(16),
         border: isCurrentUser
             ? Border.all(
-          color: colorScheme.primary.withOpacity(0.6),
+          color: colorScheme.primary.withAlpha((0.6 * 255).round()),
           width: 1.5,
         )
             : null,
         boxShadow: isCurrentUser
             ? [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.15),
+            color: colorScheme.primary.withAlpha((0.15 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),

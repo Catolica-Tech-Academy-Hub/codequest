@@ -137,8 +137,8 @@ class _PodiumSlot extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                crownColor.withOpacity(0.85),
-                crownColor.withOpacity(0.4),
+                crownColor.withAlpha((0.85 * 255).round()),
+                crownColor.withAlpha((0.4 * 255).round()),
               ],
             ),
             borderRadius: const BorderRadius.vertical(
@@ -146,7 +146,7 @@ class _PodiumSlot extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: crownColor.withOpacity(0.4),
+                color: crownColor.withAlpha((0.4 * 255).round()),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -202,7 +202,7 @@ class _AvatarBadge extends StatelessWidget {
         boxShadow: isCurrentUser
             ? [
           BoxShadow(
-            color: ringColor.withOpacity(0.6),
+            color: ringColor.withAlpha((0.6 * 255).round()),
             blurRadius: 12,
             spreadRadius: 2,
           ),
@@ -211,7 +211,7 @@ class _AvatarBadge extends StatelessWidget {
       ),
       child: CircleAvatar(
         radius: size / 2,
-        backgroundColor: ringColor.withOpacity(0.15),
+        backgroundColor: ringColor.withAlpha((0.15 * 255).round()),
         child: Text(
           initial,
           style: TextStyle(

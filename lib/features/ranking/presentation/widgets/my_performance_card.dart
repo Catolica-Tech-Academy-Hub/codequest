@@ -24,12 +24,12 @@ class MyPerformanceCard extends StatelessWidget {
         color: colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: colorScheme.primary.withOpacity(0.4),
+          color: colorScheme.primary.withAlpha((0.4 * 255).round()),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.2),
+            color: colorScheme.primary.withAlpha((0.2 * 255).round()),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -46,7 +46,7 @@ class MyPerformanceCard extends StatelessWidget {
                 Text(
                   'Meu desempenho',
                   style: theme.textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onPrimaryContainer.withOpacity(0.7),
+                    color: colorScheme.onPrimaryContainer.withAlpha((0.7 * 255).round()),
                     fontWeight: FontWeight.w600,
                   ),
                 ),

@@ -19,6 +19,7 @@ class MockTrailDataSource implements TrailDataSource {
           'level_4',
           'level_5',
           'level_6',
+          'code-sorting-preview',
         ],
       ),
     ];

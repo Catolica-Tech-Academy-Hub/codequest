@@ -16,7 +16,6 @@ class ScheduleStreakReminderAction {
   final StreakTracker _streakTracker;
   final NotificationRepositoryContract _notificationRepository;
 
-  /// Verifica preferências e estado de atividade, e agenda ou cancela o lembrete.
   Future<void> call(String uid) async {
     try {
       final prefs = await _notificationRepository.getPreferences(uid);

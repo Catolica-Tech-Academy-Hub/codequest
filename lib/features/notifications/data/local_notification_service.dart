@@ -44,8 +44,6 @@ class LocalNotificationService {
     );
   }
 
-  /// Agenda lembrete de streak para as 20h do horário local.
-  /// Se já passou das 20h hoje, agenda para amanhã.
   Future<void> scheduleStreakReminder() async {
     try {
       final now = tz.TZDateTime.now(tz.local);

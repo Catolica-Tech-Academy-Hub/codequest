@@ -13,7 +13,6 @@ class CheckPendingPromotionsAction {
   final NotificationRepositoryContract _notificationRepository;
   final LocalNotificationService _localNotificationService;
 
-  /// Retorna promoções pendentes e exibe notificação local para cada uma.
   Stream<List<PendingPromotion>> call(String uid) {
     return _notificationRepository.watchPendingPromotions(uid).map(
       (promotions) {

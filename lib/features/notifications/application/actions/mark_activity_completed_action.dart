@@ -12,8 +12,6 @@ class MarkActivityCompletedAction {
   final StreakTracker _streakTracker;
   final LocalNotificationService _localNotificationService;
 
-  /// Marca que o usuário completou uma atividade hoje e cancela o lembrete de streak.
-  /// Reagenda para o dia seguinte automaticamente na próxima abertura do app.
   Future<void> call() async {
     try {
       await _streakTracker.markActivityCompleted();

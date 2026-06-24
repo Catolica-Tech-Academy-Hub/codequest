@@ -9,6 +9,7 @@ import '../widgets/draggable_logic_block.dart';
 import '../widgets/drop_zone.dart';
 import '../widgets/feedback_widgets.dart';
 import '../../providers/block_assembly_providers.dart';
+import '../../../../shared/widgets/feedback_modal.dart';
 
 /// Tela principal do desafio de montagem lógica por blocos.
 ///
@@ -37,7 +38,6 @@ class BlockAssemblyPage extends ConsumerStatefulWidget {
 class _BlockAssemblyPageState extends ConsumerState<BlockAssemblyPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _pageAnimationController;
-  FeedbackOverlay? _lastFeedback;
 
   @override
   void initState() {
@@ -60,11 +60,6 @@ class _BlockAssemblyPageState extends ConsumerState<BlockAssemblyPage>
     final challengeAsync = ref.watch(
       blockAssemblyChallengeProvider(widget.challengeId),
     );
-    final progressAsync = ref.watch(
-      userChallengeProgressProvider(
-        (userId: widget.userId, challengeId: widget.challengeId),
-      ),
-    );
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -77,9 +72,6 @@ class _BlockAssemblyPageState extends ConsumerState<BlockAssemblyPage>
             challenge: challenge,
             userId: widget.userId,
             pageAnimationController: _pageAnimationController,
-            onFeedbackDismiss: () {
-              setState(() => _lastFeedback = null);
-            },
           );
         },
       ),
@@ -115,13 +107,11 @@ class _ChallengeBody extends ConsumerStatefulWidget {
     required this.challenge,
     required this.userId,
     required this.pageAnimationController,
-    required this.onFeedbackDismiss,
   });
 
   final AssemblyChallenge challenge;
   final String userId;
   final AnimationController pageAnimationController;
-  final VoidCallback onFeedbackDismiss;
 
   @override
   ConsumerState<_ChallengeBody> createState() => _ChallengeBodyState();
@@ -142,7 +132,7 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
     final boardState = ref.watch(assemblyBoardProvider);
     final progressAsync = ref.watch(
       userChallengeProgressProvider(
-        (userId: widget.userId, challengeId: widget.challengeId),
+        (userId: widget.userId, challengeId: widget.challenge.id),
       ),
     );
     final submitUseCase = ref.watch(submitAssemblyAttemptUseCaseProvider);
@@ -202,9 +192,9 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
             error: (_, __) => const SizedBox.shrink(),
             data: (progress) => progress != null
                 ? RemainingAttemptsWidget(
-                    current: progress.attemptCount,
-                    max: widget.challenge.maxAttempts,
-                  )
+              current: progress.attemptCount,
+              max: widget.challenge.maxAttempts,
+            )
                 : const SizedBox.shrink(),
           ),
           const SizedBox(height: 16),
@@ -235,9 +225,9 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
   }
 
   Future<void> _handleSubmit(
-    BuildContext context,
-    dynamic submitUseCase,
-  ) async {
+      BuildContext context,
+      dynamic submitUseCase,
+      ) async {
     final boardState = ref.read(assemblyBoardProvider);
 
     if (!boardState.isSequenceFull) {
@@ -262,53 +252,38 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
       );
 
       if (mounted) {
-        // Exibir feedback
         if (result.isSuccess) {
-          _showSuccessFeedback(context, result.feedback, result.xpEarned);
-          // Aguardar feedback e voltar
-          await Future.delayed(const Duration(seconds: 3));
-          if (mounted) Navigator.of(context).pop();
+          await showFeedbackModal(
+            context,
+            status: FeedbackStatus.correct,
+            message: '${result.feedback}\nVocê ganhou +${result.xpEarned} XP!',
+            onContinue: () {
+              Navigator.of(context).pop();
+            },
+          );
         } else {
-          _showErrorFeedback(context, result.feedback);
-          ref.read(assemblyBoardProvider.notifier).clearSequence();
+          await showFeedbackModal(
+            context,
+            status: FeedbackStatus.wrong,
+            message: result.feedback,
+            onContinue: () {
+              ref.read(assemblyBoardProvider.notifier).clearSequence();
+            },
+          );
         }
       }
     } catch (e) {
       if (mounted) {
-        _showErrorFeedback(context, 'Erro: $e');
+        await showFeedbackModal(
+          context,
+          status: FeedbackStatus.wrong,
+          message: 'Erro inesperado: $e',
+          onContinue: () {},
+        );
       }
     } finally {
       ref.read(assemblyBoardProvider.notifier).setSubmitting(false);
     }
-  }
-
-  void _showSuccessFeedback(
-    BuildContext context,
-    String message,
-    int xpEarned,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: FeedbackOverlay(
-          isSuccess: true,
-          message: message,
-          xpEarned: xpEarned,
-          onDismiss: () => Navigator.of(context).pop(),
-        ),
-      ),
-    );
-  }
-
-  void _showErrorFeedback(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 3),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ),
-    );
   }
 }
 
@@ -414,7 +389,7 @@ class _BlocksSource extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final availableBlocks =
-        blocks.where((b) => !selectedIds.contains(b.id.value)).toList();
+    blocks.where((b) => !selectedIds.contains(b.id.value)).toList();
 
     return Wrap(
       spacing: 8,
@@ -422,10 +397,10 @@ class _BlocksSource extends StatelessWidget {
       children: availableBlocks
           .map(
             (block) => DraggableLogicBlock(
-              block: block,
-              isSelected: false,
-            ),
-          )
+          block: block,
+          isSelected: false,
+        ),
+      )
           .toList(),
     );
   }
@@ -447,10 +422,10 @@ class _DropZonesRow extends ConsumerWidget {
     return Column(
       children: List.generate(
         challenge.blocks.length,
-        (index) {
+            (index) {
           final expectedBlock = challenge.blocks[index];
           final currentBlock =
-              index < selectedSequence.length ? selectedSequence[index] : null;
+          index < selectedSequence.length ? selectedSequence[index] : null;
           final hasError = validationErrors.contains(index);
 
           return Padding(
@@ -506,13 +481,13 @@ class _ActionButtons extends StatelessWidget {
             onPressed: isSubmitting || !isSequenceFull ? null : onSubmit,
             icon: isSubmitting
                 ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation(colorScheme.onPrimary),
-                    ),
-                  )
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation(colorScheme.onPrimary),
+              ),
+            )
                 : const Icon(Icons.check),
             label: Text(isSubmitting ? 'Enviando...' : 'Enviar'),
           ),

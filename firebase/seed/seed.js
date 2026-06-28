@@ -164,6 +164,8 @@ async function seed() {
 
   for (const user of seedUsers) {
     await upsertUser(user);
+    // Estado de gamificação vive em `users/{uid}` (lido pelo ranking e pelas
+    // conquistas): xpTotal/streakDays/positionChange vêm do próprio seedUser.
     await db.collection('users').doc(user.uid).set(
       {
         uid: user.uid,
@@ -180,13 +182,14 @@ async function seed() {
     );
   }
 
+  const leagueEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   await db.collection('leagues').doc(bronzeLeagueId).set(
     {
       id: bronzeLeagueId,
       name: 'Bronze',
-      // tier como String e endsAt como Date (vira Timestamp): formato exigido pela leitura no app.
+      // Campos lidos pelo ranking (_LeagueDto): tier textual + janela da liga.
       tier: 'bronze',
-      endsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      endsAt: leagueEndsAt,
       promotionThreshold: 15,
       totalParticipants: seedUsers.length,
       createdAt: new Date().toISOString(),

@@ -75,7 +75,7 @@ if %errorlevel% neq 0 (
     echo.
     echo  Como resolver:
     echo    1. Abra o Docker Desktop na barra de tarefas
-    echo    2. Aguarde o icone ficar verde (status: running)
+    echo    2. Aguarde o icone ficar verde ^(status: running^)
     echo    3. Rode este script novamente
     echo.
     goto :erro_fatal
@@ -128,10 +128,10 @@ if not exist "%SDK_MGR%" (
     echo  │  PASSO OBRIGATORIO - Faca isso AGORA no Android Studio: │
     echo  │                                                         │
     echo  │  1. Abra o Android Studio                               │
-    echo  │  2. Clique em "More Actions" (tela inicial)             │
+    echo  │  2. Clique em "More Actions" ^(tela inicial^)             │
     echo  │     OU va em Tools ^> SDK Manager                        │
     echo  │  3. Clique na aba "SDK Tools"                           │
-    echo  │  4. Marque "Android SDK Command-line Tools (latest)"    │
+    echo  │  4. Marque "Android SDK Command-line Tools ^(latest^)"    │
     echo  │  5. Clique "Apply" e aguarde o download                 │
     echo  │  6. Feche o SDK Manager e rode este script novamente    │
     echo  ╚─────────────────────────────────────────────────────────╝

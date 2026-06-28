@@ -2,6 +2,21 @@ const TIER_LADDER = ['bronze', 'silver', 'gold', 'diamond'];
 const PROMOTION_COUNT = 15;
 const DEMOTION_COUNT = 5;
 
+/**
+ * Segunda-feira 00:00 UTC da semana que acabou de fechar.
+ * O reset roda na segunda; o XP semanal (`weeklyXp`) foi acumulado na semana
+ * anterior, então o snapshot é chaveado pela segunda dessa semana encerrada.
+ */
+function closingWeekStart(now = new Date()) {
+  const date = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  );
+  const dayOfWeek = date.getUTCDay(); // 0=domingo, 1=segunda
+  const daysSinceMonday = (dayOfWeek + 6) % 7;
+  date.setUTCDate(date.getUTCDate() - daysSinceMonday - 7);
+  return date;
+}
+
 class WeeklyResetAction {
   constructor(rankingRepository) {
     this.rankingRepository = rankingRepository;
@@ -9,6 +24,10 @@ class WeeklyResetAction {
 
   async execute() {
     const leagues = await this.rankingRepository.listLeagues();
+
+    const weekStart = closingWeekStart();
+    const weekStartId = weekStart.toISOString().slice(0, 10);
+    const snapshots = [];
 
     let promoted = 0;
     let demoted = 0;
@@ -39,6 +58,23 @@ class WeeklyResetAction {
       );
 
       const userUpdates = [];
+
+      users.forEach((user, index) => {
+        // Snapshot da evolução temporal antes de zerar: weeklyXp é o XP ganho
+        // na semana; xpTotal é o acumulado; position vem do recálculo (fallback
+        // para a ordem por weeklyXp da liga).
+        snapshots.push({
+          uid: user.id,
+          weekStartId,
+          data: {
+            weekStart,
+            xpTotal: Number(user.xpTotal) || 0,
+            xpGained: Number(user.weeklyXp) || 0,
+            position: Number(user.position) || index + 1,
+            streakDays: Number(user.streakDays) || 0,
+          },
+        });
+      });
 
       for (const user of users) {
         const data = { weeklyXp: 0, positionChange: 0 };
@@ -76,7 +112,9 @@ class WeeklyResetAction {
       reset += userUpdates.length;
     }
 
-    return { reset, promoted, demoted };
+    await this.rankingRepository.writeXpHistorySnapshots(snapshots);
+
+    return { reset, promoted, demoted, snapshots: snapshots.length };
   }
 }
 

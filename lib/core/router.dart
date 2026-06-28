@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:codequest/features/achievements/presentation/achievements_page.dart';
+import 'package:codequest/features/statistics/presentation/statistics_page.dart';
 import 'package:codequest/features/code_sorting/presentation/code_sorting_page.dart';
 import 'package:codequest/features/levels/presentation/level_page.dart';
 import 'package:codequest/features/auth/providers/auth_providers.dart';
@@ -70,6 +71,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (BuildContext context, GoRouterState state) => const ProfilePage(),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/statistics',
+        builder: (BuildContext context, GoRouterState state) => const StatisticsPage(),
       ),
       GoRoute(
         path: '/trail/:trailId',

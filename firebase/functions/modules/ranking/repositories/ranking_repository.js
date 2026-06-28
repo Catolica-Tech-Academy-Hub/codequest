@@ -129,6 +129,34 @@ class RankingRepository {
     await batch.commit();
   }
 
+  /**
+   * Grava os snapshots semanais de XP em `users/{uid}/xpHistory/{weekStartId}`.
+   * doc.id = data do início da semana torna a escrita idempotente (re-rodar o
+   * reset não duplica a semana). Commita em lotes para respeitar o limite do batch.
+   */
+  async writeXpHistorySnapshots(snapshots) {
+    if (!snapshots || snapshots.length === 0) {
+      return;
+    }
+    let batch = this._db.batch();
+    let operations = 0;
+    for (const snapshot of snapshots) {
+      const ref = this._userDoc(snapshot.uid)
+        .collection('xpHistory')
+        .doc(snapshot.weekStartId);
+      batch.set(ref, snapshot.data, { merge: true });
+      operations += 1;
+      if (operations >= 400) {
+        await batch.commit();
+        batch = this._db.batch();
+        operations = 0;
+      }
+    }
+    if (operations > 0) {
+      await batch.commit();
+    }
+  }
+
   async deleteUserData(uid, leagueId) {
     const userRef = this._userDoc(uid);
     const progress = await userRef.collection('progress').get();

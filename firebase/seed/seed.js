@@ -159,8 +159,62 @@ async function upsertUser(user) {
   }
 }
 
+const HISTORY_WEEKS = 10;
+
+/** Segunda-feira 00:00 UTC de `weeksAgo` semanas atrás. */
+function mondayUtc(weeksAgo) {
+  const now = new Date();
+  const date = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  );
+  const daysSinceMonday = (date.getUTCDay() + 6) % 7;
+  date.setUTCDate(date.getUTCDate() - daysSinceMonday - weeksAgo * 7);
+  return date;
+}
+
+/**
+ * Gera HISTORY_WEEKS snapshots semanais de XP cumulativo crescente, terminando
+ * exatamente no xpTotal atual do usuário (curva de evolução para o gráfico).
+ */
+function buildXpHistory(user, position) {
+  const total = user.xpTotal || 0;
+  let weightSum = 0;
+  for (let i = 1; i <= HISTORY_WEEKS; i += 1) {
+    weightSum += i;
+  }
+
+  const entries = [];
+  let cumulative = 0;
+  for (let i = 0; i < HISTORY_WEEKS; i += 1) {
+    const weeksAgo = HISTORY_WEEKS - 1 - i; // do mais antigo para o mais recente
+    let gain = Math.round((total * (i + 1)) / weightSum);
+    if (i === HISTORY_WEEKS - 1) {
+      gain = total - cumulative; // fecha exatamente no total atual
+    }
+    cumulative += gain;
+    const weekStart = mondayUtc(weeksAgo);
+    entries.push({
+      weekStartId: weekStart.toISOString().slice(0, 10),
+      weekStart,
+      xpTotal: cumulative,
+      xpGained: gain,
+      position,
+      streakDays: Math.max(0, (user.streakDays || 0) - weeksAgo),
+    });
+  }
+  return entries;
+}
+
 async function seed() {
   console.log('[seed] start');
+
+  // Posição final por XP (rank entre os seed users), reaproveitada no histórico.
+  const positionByUid = {};
+  [...seedUsers]
+    .sort((a, b) => b.xpTotal - a.xpTotal)
+    .forEach((user, index) => {
+      positionByUid[user.uid] = index + 1;
+    });
 
   for (const user of seedUsers) {
     await upsertUser(user);
@@ -180,7 +234,28 @@ async function seed() {
       },
       { merge: true },
     );
+
+    // Histórico semanal de XP (evolução temporal) para a aba de Estatísticas.
+    const history = buildXpHistory(user, positionByUid[user.uid]);
+    for (const entry of history) {
+      await db
+        .collection('users')
+        .doc(user.uid)
+        .collection('xpHistory')
+        .doc(entry.weekStartId)
+        .set(
+          {
+            weekStart: entry.weekStart,
+            xpTotal: entry.xpTotal,
+            xpGained: entry.xpGained,
+            position: entry.position,
+            streakDays: entry.streakDays,
+          },
+          { merge: true },
+        );
+    }
   }
+  console.log(`[seed] xpHistory populated (${HISTORY_WEEKS} semanas/usuário)`);
 
   const leagueEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   await db.collection('leagues').doc(bronzeLeagueId).set(

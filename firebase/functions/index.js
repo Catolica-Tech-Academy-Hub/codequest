@@ -1,14 +1,16 @@
 const admin = require('firebase-admin');
-const { onRequest } = require('firebase-functions/v2/https');
+const { onRequest, onCall } = require('firebase-functions/v2/https');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { createSampleModule } = require('./modules/sample');
+const { createUserModule } = require('./modules/user');
 const { processLeagueCycle } = require('./modules/leagues');
 const { processMailDocument, sendWelcomeEmail } = require('./modules/notifications');
 
 admin.initializeApp();
 
 const sampleController = createSampleModule();
+const userController = createUserModule();
 
 // HTTP Trigger - Health check
 exports.health = onRequest((request, response) => {
@@ -33,6 +35,12 @@ exports.sampleApi = onRequest(async (request, response) => {
 
   response.status(405).json({ message: 'Method not allowed' });
 });
+
+exports.updateUserProfile = onCall(userController.updateProfile);
+
+exports.updateUserNotifications = onCall(userController.updateNotifications);
+
+exports.deleteUserAccount = onCall(userController.deleteAccount);
 
 // Pub/Sub Trigger - Ciclo Semanal das Ligas
 // Executa todo domingo às 23:59

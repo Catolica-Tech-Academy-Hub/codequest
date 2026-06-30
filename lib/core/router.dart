@@ -1,11 +1,13 @@
 import 'dart:async';
 
-import 'package:codequest/features/code_sorting/presentation/code_sorting_page.dart';
-import 'package:codequest/features/levels/presentation/level_page.dart';
-import 'package:codequest/features/auth/providers/auth_providers.dart';
 import 'package:codequest/features/auth/presentation/login_page.dart';
 import 'package:codequest/features/auth/presentation/register_page.dart';
+import 'package:codequest/features/auth/providers/auth_providers.dart';
+import 'package:codequest/features/code_sorting/presentation/code_sorting_page.dart';
 import 'package:codequest/features/home/presentation/home_page.dart';
+import 'package:codequest/features/levels/presentation/level_page.dart';
+import 'package:codequest/features/notifications/presentation/notification_initializer.dart';
+import 'package:codequest/features/notifications/presentation/notification_settings_page.dart';
 import 'package:codequest/features/profile/presentation/change_password_page.dart';
 import 'package:codequest/features/profile/presentation/delete_account_page.dart';
 import 'package:codequest/features/profile/presentation/edit_profile_page.dart';
@@ -14,10 +16,10 @@ import 'package:codequest/features/profile/presentation/settings_page.dart';
 import 'package:codequest/features/ranking/presentation/ranking_page.dart';
 import 'package:codequest/features/trails/presentation/trail_detail_page.dart';
 import 'package:codequest/features/trails/presentation/trails_page.dart';
+import 'package:codequest/screens/notification_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:codequest/screens/notification_settings_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   // HOTFIX: mantém o authStateProvider vivo para o ref.read dentro do redirect enxergar AsyncData em vez de loading
@@ -41,11 +43,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/login',
-        builder: (BuildContext context, GoRouterState state) => const LoginPage(),
+        builder: (BuildContext context, GoRouterState state) =>
+            const LoginPage(),
       ),
       GoRoute(
         path: '/register',
-        builder: (BuildContext context, GoRouterState state) => const RegisterPage(),
+        builder: (BuildContext context, GoRouterState state) =>
+            const RegisterPage(),
       ),
       GoRoute(
         path: '/home',
@@ -53,20 +57,25 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       ShellRoute(
         builder: (BuildContext context, GoRouterState state, Widget child) {
-          return HomePage(child: child);
+          return NotificationInitializer(
+            child: HomePage(child: child),
+          );
         },
         routes: <RouteBase>[
           GoRoute(
             path: '/home/trails',
-            builder: (BuildContext context, GoRouterState state) => const TrailsPage(),
+            builder: (BuildContext context, GoRouterState state) =>
+                const TrailsPage(),
           ),
           GoRoute(
             path: '/home/ranking',
-            builder: (BuildContext context, GoRouterState state) => const RankingScreen(),
+            builder: (BuildContext context, GoRouterState state) =>
+                const RankingScreen(),
           ),
           GoRoute(
             path: '/home/profile',
-            builder: (BuildContext context, GoRouterState state) => const ProfilePage(),
+            builder: (BuildContext context, GoRouterState state) =>
+                const ProfilePage(),
           ),
         ],
       ),
@@ -107,21 +116,27 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-GoRoute(
-  path: '/notification-settings',
-  builder: (BuildContext context, GoRouterState state) {
-    return const AppShell();
-  },
-),
-GoRoute(
-  path: '/challenge/code-sorting/:challengeId',
-  builder: (BuildContext context, GoRouterState state) {
-    return CodeSortingPage(
-      challengeId: state.pathParameters['challengeId'] ?? '',
-      userId: state.extra as String? ?? '',
-    );
-  },
-),
+      GoRoute(
+        path: '/notification-settings',
+        builder: (BuildContext context, GoRouterState state) {
+          return const AppShell();
+        },
+      ),
+      GoRoute(
+        path: '/challenge/code-sorting/:challengeId',
+        builder: (BuildContext context, GoRouterState state) {
+          return CodeSortingPage(
+            challengeId: state.pathParameters['challengeId'] ?? '',
+            userId: state.extra as String? ?? '',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/settings/notifications',
+        builder: (BuildContext context, GoRouterState state) {
+          return const NotificationSettingsPage();
+        },
+      ),
     ],
     redirect: (BuildContext context, GoRouterState state) {
       final authState = ref.read(authStateProvider);

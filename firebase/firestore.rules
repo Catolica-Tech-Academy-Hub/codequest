@@ -20,6 +20,10 @@ service cloud.firestore {
       match /sortingProgress/{challengeId} {
         allow read, write: if isAuthenticated() && request.auth.uid == uid;
       }
+
+      match /notifications/{notificationId} {
+        allow read, write: if isAuthenticated() && request.auth.uid == uid;
+      }
     }
 
     match /leagues/{leagueId} {
@@ -54,6 +58,11 @@ service cloud.firestore {
 
     match /meta/{docId} {
       allow read: if isAuthenticated();
+      allow write: if false;
+    }
+
+    match /mail/{mailId} {
+      allow read: if false;
       allow write: if false;
     }
 

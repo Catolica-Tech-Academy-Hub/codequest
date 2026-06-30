@@ -1,4 +1,6 @@
 import 'package:codequest/features/auth/providers/auth_providers.dart';
+import 'package:codequest/features/notifications/presentation/widgets/streak_reminder_badge.dart';
+import 'package:codequest/features/notifications/providers/notification_providers.dart';
 import 'package:codequest/features/profile/providers/profile_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +13,7 @@ class ProfilePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
     final profileAsync = ref.watch(currentUserProfileProvider);
+    final prefsAsync = ref.watch(notificationPreferencesProvider);
 
     final name = user?.displayName ?? 'Usuário';
     final email = user?.email ?? '-';
@@ -63,7 +66,9 @@ class ProfilePage extends ConsumerWidget {
                 error: (_, __) => const SizedBox.shrink(),
                 data: (profile) {
                   final bio = profile?.bio;
-                  if (bio == null || bio.isEmpty) return const SizedBox.shrink();
+                  if (bio == null || bio.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
                   return Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: Text(
@@ -74,11 +79,29 @@ class ProfilePage extends ConsumerWidget {
                   );
                 },
               ),
+              prefsAsync.when(
+                loading: () => const SizedBox.shrink(),
+                error: (_, __) => const SizedBox.shrink(),
+                data: (prefs) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: StreakReminderBadge(
+                      active: prefs.pushEnabled && prefs.streakReminderEnabled,
+                    ),
+                  );
+                },
+              ),
               const SizedBox(height: 32),
               OutlinedButton.icon(
                 onPressed: () => context.push('/settings/edit-profile'),
                 icon: const Icon(Icons.edit_outlined),
                 label: const Text('Editar Perfil'),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => context.push('/settings/notifications'),
+                icon: const Icon(Icons.notifications_outlined),
+                label: const Text('Configurar Notificações'),
               ),
             ],
           ),

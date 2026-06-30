@@ -2,6 +2,7 @@
 const { initializeApp } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 const { getFirestore } = require('firebase-admin/firestore');
+const { seedBlockAssemblyChallenges } = require('./block_assembly_seed.js');
 
 const projectId = process.env.FIREBASE_PROJECT_ID || 'codequest-local';
 
@@ -187,6 +188,9 @@ async function seed() {
     leagueId: bronzeLeagueId,
     activitiesCount: seedActivities.length,
   }, { merge: true });
+
+  // 6. Seed dos desafios de block assembly
+  await seedBlockAssemblyChallenges(db);
 
   console.log('[seed] done');
 }

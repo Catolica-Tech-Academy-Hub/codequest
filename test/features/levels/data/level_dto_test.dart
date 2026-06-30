@@ -82,6 +82,88 @@ void main() {
     });
   });
 
+  group('LevelDto.toDomain (theory / RF05)', () {
+    test('theory ausente resulta em theory == null', () {
+      final dto = LevelDto(
+        id: 'q1',
+        raw: <String, dynamic>{
+          'type': 'one-choice',
+          'question': 'Qual?',
+          'answers': <String, dynamic>{'a': 'A', 'b': 'B'},
+          'correct_answer': 'b',
+        },
+      );
+      final domain = dto.toDomain() as OneChoiceLevel;
+      expect(domain.theory, isNull);
+    });
+
+    test('mapeia theory válida em one-choice', () {
+      final dto = LevelDto(
+        id: 'q1',
+        raw: <String, dynamic>{
+          'type': 'one-choice',
+          'question': 'Qual?',
+          'theory': <String, dynamic>{
+            'title': 'Operadores',
+            'body': 'Use <code>==</code>.',
+          },
+          'answers': <String, dynamic>{'a': 'A', 'b': 'B'},
+          'correct_answer': 'b',
+        },
+      );
+      final domain = dto.toDomain() as OneChoiceLevel;
+      expect(domain.theory, isNotNull);
+      expect(domain.theory!.title, 'Operadores');
+      expect(domain.theory!.body, 'Use <code>==</code>.');
+    });
+
+    test('mapeia theory válida em multi-choice', () {
+      final dto = LevelDto(
+        id: 'q2',
+        raw: <String, dynamic>{
+          'type': 'multi-choice',
+          'question': 'Quais?',
+          'theory': <String, dynamic>{
+            'title': 'Tipos',
+            'body': '<code>int</code> e <code>double</code>.',
+          },
+          'answers': <String, dynamic>{'a': 'A', 'b': 'B'},
+          'correct_answers': <dynamic>['a'],
+        },
+      );
+      final domain = dto.toDomain() as MultiChoiceLevel;
+      expect(domain.theory?.title, 'Tipos');
+    });
+
+    test('falha se theory.body ausente', () {
+      final dto = LevelDto(
+        id: 'q1',
+        raw: <String, dynamic>{
+          'type': 'one-choice',
+          'question': 'Qual?',
+          'theory': <String, dynamic>{'title': 'Só título'},
+          'answers': <String, dynamic>{'a': 'A', 'b': 'B'},
+          'correct_answer': 'b',
+        },
+      );
+      expect(dto.toDomain, throwsA(isA<MalformedLevelFailure>()));
+    });
+
+    test('falha se theory não é objeto', () {
+      final dto = LevelDto(
+        id: 'q1',
+        raw: <String, dynamic>{
+          'type': 'one-choice',
+          'question': 'Qual?',
+          'theory': 'texto solto',
+          'answers': <String, dynamic>{'a': 'A', 'b': 'B'},
+          'correct_answer': 'b',
+        },
+      );
+      expect(dto.toDomain, throwsA(isA<MalformedLevelFailure>()));
+    });
+  });
+
   group('LevelDto.toDomain (erros gerais)', () {
     test('falha em type desconhecido', () {
       final dto = LevelDto(

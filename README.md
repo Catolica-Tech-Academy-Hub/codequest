@@ -16,8 +16,8 @@ Plataforma gamificada de aprendizado de programação, construída com Flutter, 
 8. [Usuários de teste](#8-usuários-de-teste)
 9. [Arquitetura e padrões de código](#9-arquitetura-e-padrões-de-código)
 10. [Estrutura de Dados e Backend (MVP)](#10-estrutura-de-dados-e-backend-mvp)
-10. [Contribuindo (branch, commit e PR)](#11-contribuindo-branch-commit-e-pr)
-11. [Solução de problemas](#12-solução-de-problemas)
+11. [Contribuindo (branch, commit e PR)](#11-contribuindo-branch-commit-e-pr)
+12. [Solução de problemas](#12-solução-de-problemas)
 
 ---
 
@@ -315,6 +315,7 @@ lib/features/<feature>/
 | [`docs/RELEASE_AND_FIREBASE.md`](docs/RELEASE_AND_FIREBASE.md)     | Firebase real, release e publicação Android |
 
 ---
+
 ## 10. Estrutura de Dados e Backend (MVP)
 
 A modelagem do banco de dados (Cloud Firestore) foi estruturada para atender aos requisitos de gamificação e trilhas de aprendizado, garantindo a persistência do estado do usuário e a correção automática das atividades.

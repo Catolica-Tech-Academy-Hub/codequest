@@ -6,7 +6,11 @@ import 'package:codequest/features/auth/providers/auth_providers.dart';
 import 'package:codequest/features/auth/presentation/login_page.dart';
 import 'package:codequest/features/auth/presentation/register_page.dart';
 import 'package:codequest/features/home/presentation/home_page.dart';
+import 'package:codequest/features/profile/presentation/change_password_page.dart';
+import 'package:codequest/features/profile/presentation/delete_account_page.dart';
+import 'package:codequest/features/profile/presentation/edit_profile_page.dart';
 import 'package:codequest/features/profile/presentation/profile_page.dart';
+import 'package:codequest/features/profile/presentation/settings_page.dart';
 import 'package:codequest/features/ranking/presentation/ranking_page.dart';
 import 'package:codequest/features/trails/presentation/trail_detail_page.dart';
 import 'package:codequest/features/trails/presentation/trails_page.dart';
@@ -65,6 +69,26 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (BuildContext context, GoRouterState state) => const ProfilePage(),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/settings',
+        builder: (BuildContext context, GoRouterState state) =>
+            const SettingsPage(),
+      ),
+      GoRoute(
+        path: '/settings/edit-profile',
+        builder: (BuildContext context, GoRouterState state) =>
+            const EditProfilePage(),
+      ),
+      GoRoute(
+        path: '/settings/change-password',
+        builder: (BuildContext context, GoRouterState state) =>
+            const ChangePasswordPage(),
+      ),
+      GoRoute(
+        path: '/settings/delete-account',
+        builder: (BuildContext context, GoRouterState state) =>
+            const DeleteAccountPage(),
       ),
       GoRoute(
         path: '/trail/:trailId',

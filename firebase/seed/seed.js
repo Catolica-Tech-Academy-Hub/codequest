@@ -2,6 +2,7 @@
 const { initializeApp } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 const { getFirestore } = require('firebase-admin/firestore');
+const { seedBlockAssemblyChallenges } = require('./block_assembly_seed.js');
 
 const projectId = process.env.FIREBASE_PROJECT_ID || 'codequest-local';
 
@@ -244,7 +245,7 @@ async function seed() {
     },
     { merge: true },
   );
-
+  const { seedBlockAssemblyChallenges } = require('./block_assembly_seed.js');
   console.log('[seed] done');
 }
 

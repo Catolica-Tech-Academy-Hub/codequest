@@ -1,6 +1,7 @@
 /**
  * Seed de desafios de Block Assembly para Firebase
- * * Exemplos de desafios de montagem lógica por blocos
+ *
+ * Exemplos de desafios de montagem lógica por blocos
  * com dificuldades variadas.
  */
 
@@ -32,7 +33,50 @@ const blockAssemblyChallenges = [
       { id: 'block-return-widget', label: 'return Scaffold(...);', expectedPosition: 3 },
       { id: 'block-close-brace-2', label: '}', expectedPosition: 4 },
     ],
-  }
+  },
+  {
+    id: 'block-assembly-conditional',
+    title: 'Estrutura de Condicional Dart',
+    description: 'Monte a sequência correta de um bloco if-else em Dart.',
+    difficulty: 'medium',
+    xpReward: 40,
+    maxAttempts: 4,
+    blocks: [
+      { id: 'block-if', label: 'if (idade >= 18) {', expectedPosition: 0 },
+      { id: 'block-print-adult', label: "print('Você é maior de idade');", expectedPosition: 1 },
+      { id: 'block-else', label: '} else {', expectedPosition: 2 },
+      { id: 'block-print-minor', label: "print('Você é menor de idade');", expectedPosition: 3 },
+      { id: 'block-close-brace-3', label: '}', expectedPosition: 4 },
+    ],
+  },
+  {
+    id: 'block-assembly-for-loop',
+    title: 'Loop For Completo',
+    description: 'Ordene os componentes corretos de um loop for em Dart.',
+    difficulty: 'hard',
+    xpReward: 60,
+    maxAttempts: 3,
+    blocks: [
+      { id: 'block-for-init', label: 'for (int i = 0; i < 10; i++) {', expectedPosition: 0 },
+      { id: 'block-print-i', label: "print('Iteração: \$i');", expectedPosition: 1 },
+      { id: 'block-close-brace-4', label: '}', expectedPosition: 2 },
+    ],
+  },
+  {
+    id: 'block-assembly-try-catch',
+    title: 'Tratamento de Exceções',
+    description: 'Monte a estrutura correta de try-catch em Dart.',
+    difficulty: 'hard',
+    xpReward: 70,
+    maxAttempts: 3,
+    blocks: [
+      { id: 'block-try', label: 'try {', expectedPosition: 0 },
+      { id: 'block-risky-code', label: 'int resultado = 10 ~/ 0;', expectedPosition: 1 },
+      { id: 'block-catch', label: '} catch (e) {', expectedPosition: 2 },
+      { id: 'block-print-error', label: "print('Erro: \$e');", expectedPosition: 3 },
+      { id: 'block-close-brace-5', label: '}', expectedPosition: 4 },
+    ],
+  },
 ];
 
 // Função refatorada para receber a instância do Firestore (db)

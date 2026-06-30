@@ -1,24 +1,27 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Função auxiliar para verificar se o usuário está logado
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Regras para Usuários (Protegendo dados sensíveis e subcoleções)
     match /users/{uid} {
       allow read, write: if isAuthenticated() && request.auth.uid == uid;
 
-      // Regra específica para o histórico de XP (somente leitura pelo dono)
       match /xpHistory/{historyId} {
         allow read: if isAuthenticated() && request.auth.uid == uid;
         allow write: if false;
       }
+
+      match /challengeProgress/{challengeId} {
+        allow read, write: if isAuthenticated() && request.auth.uid == uid;
+      }
+
+      match /sortingProgress/{challengeId} {
+        allow read, write: if isAuthenticated() && request.auth.uid == uid;
+      }
     }
 
-    // Regras para Ligas e Membros
     match /leagues/{leagueId} {
       allow read: if isAuthenticated();
       allow write: if false;
@@ -29,7 +32,6 @@ service cloud.firestore {
       }
     }
 
-    // Regras para Trilhas e Níveis
     match /trails/{trailId} {
       allow read: if isAuthenticated();
       allow write: if false;
@@ -40,25 +42,21 @@ service cloud.firestore {
       }
     }
 
-    // Regras para Atividades soltas
     match /activities/{activityId} {
       allow read: if isAuthenticated();
       allow write: if false;
     }
 
-    // NOVA REGRA: Liberando a leitura dos desafios de bloco
     match /challenges/{challengeId} {
       allow read: if isAuthenticated();
       allow write: if false;
     }
 
-    // Regras para Metadados (Apenas leitura para usuários logados)
     match /meta/{docId} {
       allow read: if isAuthenticated();
       allow write: if false;
     }
 
-    // Bloqueia qualquer outra coleção não declarada acima
     match /{document=**} {
       allow read, write: if false;
     }

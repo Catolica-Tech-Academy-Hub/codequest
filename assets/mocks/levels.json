@@ -7,10 +7,6 @@
   "level_1": {
     "type": "one-choice",
     "question": "Qual operador testa <b>igualdade de valor</b> em Dart?",
-    "theory": {
-      "title": "Operadores de comparação",
-      "body": "Para comparar <b>valores</b> em Dart use <code>==</code> (igualdade) e <code>!=</code> (diferença).\n\n- <code>=</code> é <b>atribuição</b>, não comparação.\n- <code>==</code> testa se dois valores são iguais.\n\nExemplo:\n<pre><code>final a = 5;\nfinal b = 5;\nprint(a == b); // true</code></pre>\nDart não usa <code>===</code> — isso é de outras linguagens."
-    },
     "answers": {
       "a": "<code>=</code>",
       "b": "<code>==</code>",
@@ -22,10 +18,6 @@
   "level_2": {
     "type": "multi-choice",
     "question": "Quais destes são <b>tipos numéricos</b> primitivos em Dart?",
-    "theory": {
-      "title": "Tipos primitivos em Dart",
-      "body": "Os tipos básicos de Dart incluem <code>int</code> e <code>double</code> (numéricos), <code>String</code> (texto) e <code>bool</code> (verdadeiro/falso).\n\n- <code>int</code>: números <b>inteiros</b>.\n- <code>double</code>: números com <b>casas decimais</b>.\n\nOs dois herdam de <code>num</code>.\n\nExemplo:\n<pre><code>int idade = 30;\ndouble altura = 1.75;</code></pre>"
-    },
     "answers": {
       "a": "<code>int</code>",
       "b": "<code>String</code>",
@@ -37,10 +29,6 @@
   "level_3": {
     "type": "one-choice",
     "question": "Qual palavra-chave declara uma <i>constante em tempo de compilação</i>?",
-    "theory": {
-      "title": "final vs const",
-      "body": "Os dois criam valores que não mudam, mas em momentos diferentes:\n\n- <code>final</code>: definido <b>uma vez</b> em tempo de execução (runtime).\n- <code>const</code>: constante de <i>tempo de compilação</i> — o valor precisa ser conhecido antes de rodar.\n\nExemplo:\n<pre><code>final agora = DateTime.now(); // ok\nconst pi = 3.14;              // ok\n// const x = DateTime.now();  // erro</code></pre>"
-    },
     "answers": {
       "a": "<code>final</code>",
       "b": "<code>var</code>",
@@ -52,10 +40,6 @@
   "level_4": {
     "type": "one-choice",
     "question": "Qual widget organiza filhos em uma <b>coluna vertical</b> no Flutter?",
-    "theory": {
-      "title": "Layout: Row e Column",
-      "body": "No Flutter, dois widgets organizam os filhos em linha ou coluna:\n\n- <code>Row</code>: dispõe os filhos na <b>horizontal</b>.\n- <code>Column</code>: dispõe os filhos na <b>vertical</b>.\n\nExemplo:\n<pre><code>Column(\n  children: [\n    Text('A'),\n    Text('B'),\n  ],\n)</code></pre>"
-    },
     "answers": {
       "a": "<code>Row</code>",
       "b": "<code>Stack</code>",
@@ -67,10 +51,6 @@
   "level_5": {
     "type": "multi-choice",
     "question": "Quais destes são widgets de <b>scroll</b> no Flutter?",
-    "theory": {
-      "title": "Widgets de rolagem",
-      "body": "Quando o conteúdo é maior que a tela, use widgets que rolam:\n\n- <code>ListView</code>: lista rolável, ótima para <b>muitos itens</b>.\n- <code>SingleChildScrollView</code>: torna rolável um <b>único filho</b> grande.\n\nJá <code>Container</code> e <code>SizedBox</code> apenas posicionam/dimensionam — não rolam.\n\nExemplo:\n<pre><code>ListView(\n  children: [Text('1'), Text('2')],\n)</code></pre>"
-    },
     "answers": {
       "a": "<code>ListView</code>",
       "b": "<code>Container</code>",
@@ -82,10 +62,6 @@
   "level_6": {
     "type": "one-choice",
     "question": "Qual método é chamado para <i>reconstruir</i> um <code>StatefulWidget</code>?",
-    "theory": {
-      "title": "Estado e setState",
-      "body": "Um <code>StatefulWidget</code> pode mudar ao longo do tempo. Para atualizar a tela, altere variáveis dentro de <code>setState()</code>:\n\n- <code>setState()</code>: avisa o Flutter para <b>reconstruir</b> (chamar <code>build()</code> de novo).\n- <code>initState()</code>: roda uma vez ao criar o estado.\n- <code>dispose()</code>: roda ao destruir.\n\nExemplo:\n<pre><code>setState(() {\n  contador++;\n});</code></pre>"
-    },
     "answers": {
       "a": "<code>build()</code>",
       "b": "<code>setState()</code>",

@@ -135,6 +135,11 @@ class _ProfileBody extends ConsumerWidget {
                         ],
                       ),
                     ),
+
+                    const SizedBox(height: 24),
+
+                    // Estatísticas de Desempenho
+                    _PerformanceStatsRow(profile: profile),
                   ],
                 ),
               ),
@@ -528,6 +533,91 @@ class _ErrorView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// =============================================================================
+// Componentes de Estatística de Desempenho
+// =============================================================================
+
+/// TODO(Front-end): Extension temporária (Mock).
+/// Os campos `xp`, `position` e `streak` devem vir diretamente da entidade
+/// [UserProfile] ou [UserPerformance] quando a camada de dados for integrada.
+/// Remova esta extension quando o backend/Repository estiver pronto.
+extension UserProfileStatsExtension on UserProfile {
+  int get xp => 1250;
+  int get position => 42;
+  int get streak => 7;
+}
+
+class _PerformanceStatsRow extends StatelessWidget {
+  const _PerformanceStatsRow({required this.profile});
+
+  final UserProfile profile;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _StatItem(
+          label: 'XP',
+          value: profile.xp.toString(),
+          icon: Icons.star_rounded,
+          color: Colors.orangeAccent,
+        ),
+        _StatItem(
+          label: 'Posição',
+          value: '#${profile.position}',
+          icon: Icons.leaderboard_rounded,
+          color: Colors.blueAccent,
+        ),
+        _StatItem(
+          label: 'Ofensiva',
+          value: '${profile.streak} dias',
+          icon: Icons.local_fire_department_rounded,
+          color: Colors.deepOrangeAccent,
+        ),
+      ],
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  const _StatItem({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 28),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: Colors.white70,
+          ),
+        ),
+      ],
     );
   }
 }

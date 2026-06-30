@@ -28,7 +28,7 @@ class SignUpAction {
 
     await _profileRepository.createProfile(
       UserProfile(
-        uid: user.uid,
+        id: user.uid,
         email: user.email,
         name: resolvedName.value,
         leagueId: 'bronze-001',

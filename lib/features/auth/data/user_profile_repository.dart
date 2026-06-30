@@ -10,11 +10,13 @@ class UserProfileRepository implements UserProfileRepositoryContract {
 
   @override
   Future<void> createProfile(UserProfile profile) async {
-    await _firestore.collection('users').doc(profile.uid).set(
+    await _firestore.collection('users').doc(profile.id).set(
       {
-        'uid': profile.uid,
+        'uid': profile.id,
         'email': profile.email,
         'name': profile.name,
+        'avatarUrl': profile.avatarUrl,
+        'settings': profile.settings,
         'leagueId': profile.leagueId,
         'createdAt': FieldValue.serverTimestamp(),
       },
@@ -31,9 +33,11 @@ class UserProfileRepository implements UserProfileRepositoryContract {
 
     final data = doc.data()!;
     return UserProfile(
-      uid: data['uid'] as String,
+      id: data['uid'] as String,
       email: data['email'] as String,
       name: data['name'] as String,
+      avatarUrl: data['avatarUrl'] as String?,
+      settings: (data['settings'] as Map<String, dynamic>?) ?? const {},
       leagueId: data['leagueId'] as String,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
     );

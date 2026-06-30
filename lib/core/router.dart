@@ -62,7 +62,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/home/profile',
-            builder: (BuildContext context, GoRouterState state) => const ProfilePage(),
+            builder: (BuildContext context, GoRouterState state) => const ProfileScreen(),
           ),
         ],
       ),

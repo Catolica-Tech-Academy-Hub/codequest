@@ -23,11 +23,13 @@ class _UserProfileDto {
     required this.xpTotal,
     required this.streakDays,
     required this.leagueId,
+    this.avatarUrl,
     this.positionChange = 0,
   });
 
   final String userId;
   final String displayName;
+  final String? avatarUrl;
   final int xpTotal;
   final int streakDays;
   final String leagueId;
@@ -40,6 +42,7 @@ class _UserProfileDto {
     return _UserProfileDto(
       userId: doc.id,
       displayName: (data['displayName'] as String?) ?? 'Aluno',
+      avatarUrl: data['avatarUrl'] as String?,
       xpTotal: (data['xpTotal'] as int?) ?? 0,
       streakDays: (data['streakDays'] as int?) ?? 0,
       leagueId: (data['leagueId'] as String?) ?? '',
@@ -54,6 +57,7 @@ class _UserProfileDto {
     return RankingEntry(
       userId: userId,
       displayName: displayName,
+      avatarUrl: avatarUrl,
       xpTotal: xpTotal,
       position: position,
       streakDays: streakDays,

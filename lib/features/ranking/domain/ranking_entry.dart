@@ -11,6 +11,7 @@ class RankingEntry extends Equatable {
     required this.position,
     required this.streakDays,
     required this.leagueId,
+    this.avatarUrl,
     this.isCurrentUser = false,
     this.positionChange = 0,
   });
@@ -20,6 +21,9 @@ class RankingEntry extends Equatable {
 
   /// Nome de exibição do aluno.
   final String displayName;
+
+  /// URL do avatar do usuário (pode ser nulo se não definido).
+  final String? avatarUrl;
 
   /// Total de XP acumulado.
   final int xpTotal;
@@ -43,6 +47,7 @@ class RankingEntry extends Equatable {
   List<Object?> get props => [
     userId,
     displayName,
+    avatarUrl,
     xpTotal,
     position,
     streakDays,

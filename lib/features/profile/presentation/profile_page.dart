@@ -148,6 +148,19 @@ class _ProfileBody extends ConsumerWidget {
         ),
 
         // ------------------------------------------------------------------
+        // Atalho para o ranking (RF01)
+        // ------------------------------------------------------------------
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+          sliver: SliverToBoxAdapter(
+            child: _RankingShortcutCard(
+              isDark: isDark,
+              colorScheme: colorScheme,
+            ),
+          ),
+        ),
+
+        // ------------------------------------------------------------------
         // Seção de configurações
         // ------------------------------------------------------------------
         SliverPadding(
@@ -486,6 +499,98 @@ class _TileDivider extends StatelessWidget {
       indent: 70,
       endIndent: 16,
       color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+    );
+  }
+}
+
+// =============================================================================
+// Card de atalho para o ranking (RF01)
+// =============================================================================
+
+class _RankingShortcutCard extends StatelessWidget {
+  const _RankingShortcutCard({
+    required this.isDark,
+    required this.colorScheme,
+  });
+
+  final bool isDark;
+  final ColorScheme colorScheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      clipBehavior: Clip.antiAlias,
+      color: isDark ? colorScheme.surfaceContainerHigh : Colors.white,
+      child: InkWell(
+        onTap: () => context.go('/home/ranking'),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              // Ícone com fundo gradiente
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.amber.shade600,
+                      Colors.orange.shade700,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.amber.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.emoji_events_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+
+              const SizedBox(width: 14),
+
+              // Texto
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Ver Ranking',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Confira sua posição na classificação',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Icon(
+                Icons.chevron_right_rounded,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

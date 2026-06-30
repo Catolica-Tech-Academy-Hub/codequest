@@ -3,7 +3,6 @@ import 'package:codequest/features/levels/domain/entities/level_result.dart';
 import 'package:codequest/features/levels/domain/value_objects/answer_key.dart';
 import 'package:codequest/features/levels/presentation/widgets/answer_option_tile.dart';
 import 'package:codequest/features/levels/presentation/widgets/rich_level_text.dart';
-import 'package:codequest/features/levels/presentation/widgets/theory_dialog.dart';
 import 'package:codequest/features/levels/providers/level_providers.dart';
 import 'package:codequest/shared/widgets/feedback_modal.dart';
 import 'package:flutter/material.dart';
@@ -26,18 +25,6 @@ class MultiChoiceLevelWidget extends ConsumerStatefulWidget {
 class _MultiChoiceLevelWidgetState extends ConsumerState<MultiChoiceLevelWidget> {
   final Set<AnswerKey> _selected = <AnswerKey>{};
   LevelResult? _result;
-
-  @override
-  void initState() {
-    super.initState();
-    // RF05: exibe a Teoria em pop-up antes do exercício, após o primeiro frame.
-    final theory = widget.level.theory;
-    if (theory != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) showTheoryDialog(context, theory);
-      });
-    }
-  }
 
   void _toggle(AnswerKey key) {
     if (_result != null) return;

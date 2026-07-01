@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:codequest/features/block_assembly/application/actions/validate_assembly_use_case.dart';
 import 'package:codequest/features/block_assembly/domain/entities/assembly_challenge.dart';
 import 'package:codequest/features/block_assembly/domain/entities/logic_block.dart';
-import 'package:codequest/features/block_assembly/domain/errors/block_assembly_error.dart';
 import 'package:codequest/features/block_assembly/domain/value_objects/block_id.dart';
 import 'package:codequest/features/block_assembly/domain/value_objects/block_label.dart';
 

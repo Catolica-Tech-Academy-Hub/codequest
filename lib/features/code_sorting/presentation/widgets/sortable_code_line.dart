@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/entities/code_line.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_line.dart';
 
 /// Widget que representa uma linha de código arrastável.
 ///

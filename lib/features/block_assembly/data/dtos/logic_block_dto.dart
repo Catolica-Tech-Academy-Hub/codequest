@@ -1,6 +1,6 @@
-import '../../domain/entities/logic_block.dart';
-import '../../domain/value_objects/block_id.dart';
-import '../../domain/value_objects/block_label.dart';
+import 'package:codequest/features/block_assembly/domain/entities/logic_block.dart';
+import 'package:codequest/features/block_assembly/domain/value_objects/block_id.dart';
+import 'package:codequest/features/block_assembly/domain/value_objects/block_label.dart';
 
 /// DTO que mapeia um bloco lógico do Firestore para entidade de domínio.
 ///

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import 'logic_block.dart';
+import 'package:codequest/features/block_assembly/domain/entities/logic_block.dart';
 
 /// Entidade que representa um desafio de montagem lógica.
 ///

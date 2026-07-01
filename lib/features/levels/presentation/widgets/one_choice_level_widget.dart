@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:codequest/features/levels/domain/entities/level.dart';
 import 'package:codequest/features/levels/domain/entities/level_result.dart';
 import 'package:codequest/features/levels/domain/value_objects/answer_key.dart';
@@ -5,6 +7,7 @@ import 'package:codequest/features/levels/presentation/widgets/answer_option_til
 import 'package:codequest/features/levels/presentation/widgets/rich_level_text.dart';
 import 'package:codequest/features/levels/presentation/widgets/theory_dialog.dart';
 import 'package:codequest/features/levels/providers/level_providers.dart';
+import 'package:codequest/features/xp/providers/xp_providers.dart';
 import 'package:codequest/shared/widgets/feedback_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,6 +54,13 @@ class _OneChoiceLevelWidgetState extends ConsumerState<OneChoiceLevelWidget> {
         .read(levelControllerProvider)
         .evaluate(widget.level, <AnswerKey>{selected});
     setState(() => _result = result);
+
+    unawaited(
+      ref.read(xpControllerProvider).awardForLevel(
+            level: widget.level,
+            result: result,
+          ),
+    );
 
     if (!mounted) return;
     await showFeedbackModal(

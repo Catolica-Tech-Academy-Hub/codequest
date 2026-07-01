@@ -70,6 +70,27 @@ class AuthFailure implements Exception {
     );
   }
 
+  factory AuthFailure.requiresRecentLogin() {
+    return const AuthFailure(
+      code: 'requires-recent-login',
+      message: 'Por seguranca, faca login novamente antes de continuar.',
+    );
+  }
+
+  factory AuthFailure.passwordMismatch() {
+    return const AuthFailure(
+      code: 'password-mismatch',
+      message: 'As senhas nao coincidem.',
+    );
+  }
+
+  factory AuthFailure.invalidBio() {
+    return const AuthFailure(
+      code: 'invalid-bio',
+      message: 'O recado deve ter no maximo 160 caracteres.',
+    );
+  }
+
   factory AuthFailure.unexpected() {
     return const AuthFailure(
       code: 'unexpected-auth-error',

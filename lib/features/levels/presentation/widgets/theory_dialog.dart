@@ -23,35 +23,38 @@ class TheoryDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 520),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              _TheoryBadge(theme: theme),
-              const SizedBox(height: 12),
-              RichLevelText(theory.title, style: theme.textTheme.headlineSmall),
-              const SizedBox(height: 16),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: RichLevelText(
-                    theory.body,
-                    style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+    return PopScope(
+      canPop: false,
+      child: Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _TheoryBadge(theme: theme),
+                const SizedBox(height: 12),
+                RichLevelText(theory.title, style: theme.textTheme.headlineSmall),
+                const SizedBox(height: 16),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: RichLevelText(
+                      theory.body,
+                      style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              FilledButton.icon(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.play_arrow_rounded),
-                label: const Text('Começar'),
-              ),
-            ],
+                const SizedBox(height: 24),
+                FilledButton.icon(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.play_arrow_rounded),
+                  label: const Text('Começar'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

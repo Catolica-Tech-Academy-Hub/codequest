@@ -1,12 +1,12 @@
 import 'package:uuid/uuid.dart';
 
-import '../../domain/entities/assembly_attempt.dart';
-import '../../domain/entities/assembly_challenge.dart';
-import '../../domain/entities/user_challenge_progress.dart';
-import '../../domain/errors/block_assembly_error.dart';
-import '../../domain/repositories/block_assembly_repository_contract.dart';
-import '../../domain/value_objects/block_id.dart';
-import 'validate_assembly_use_case.dart';
+import 'package:codequest/features/block_assembly/domain/entities/assembly_attempt.dart';
+import 'package:codequest/features/block_assembly/domain/entities/assembly_challenge.dart';
+import 'package:codequest/features/block_assembly/domain/entities/user_challenge_progress.dart';
+import 'package:codequest/features/block_assembly/domain/errors/block_assembly_error.dart';
+import 'package:codequest/features/block_assembly/domain/repositories/block_assembly_repository_contract.dart';
+import 'package:codequest/features/block_assembly/domain/value_objects/block_id.dart';
+import 'package:codequest/features/block_assembly/application/actions/validate_assembly_use_case.dart';
 
 /// Use case que orquestra uma tentativa completa de resolver um desafio.
 ///

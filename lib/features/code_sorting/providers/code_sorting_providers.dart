@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../application/actions/submit_sorting_attempt_use_case.dart';
-import '../application/actions/validate_sorting_use_case.dart';
-import '../data/repositories/code_sorting_repository.dart';
-import '../domain/entities/code_sorting_challenge.dart';
-import '../domain/entities/user_sorting_progress.dart';
-import '../domain/repositories/code_sorting_repository_contract.dart';
+import 'package:codequest/features/code_sorting/application/actions/submit_sorting_attempt_use_case.dart';
+import 'package:codequest/features/code_sorting/application/actions/validate_sorting_use_case.dart';
+import 'package:codequest/features/code_sorting/data/repositories/code_sorting_repository.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_sorting_challenge.dart';
+import 'package:codequest/features/code_sorting/domain/entities/user_sorting_progress.dart';
+import 'package:codequest/features/code_sorting/domain/repositories/code_sorting_repository_contract.dart';
 
 final _firestoreProvider = Provider<FirebaseFirestore>(
   (ref) => FirebaseFirestore.instance,

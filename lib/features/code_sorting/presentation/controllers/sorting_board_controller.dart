@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain/entities/code_line.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_line.dart';
 
 /// Estado do tabuleiro de ordenação de código.
 ///
@@ -54,7 +54,7 @@ class SortingBoardNotifier extends StateNotifier<SortingBoardState> {
           lines: [],
           submitting: false,
           errorIndices: {},
-        ));
+        ),);
 
   /// Inicializa com as linhas embaralhadas.
   void initializeLines(List<CodeLine> lines) {

@@ -16,6 +16,9 @@ class TrailDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(trailByIdProvider(trailId));
+    final progressState = ref.watch(userTrailProgressProvider(trailId));
+    final highestUnlockedIndex =
+        progressState.valueOrNull?.highestUnlockedLevelIndex ?? 0;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -25,8 +28,10 @@ class TrailDetailPage extends ConsumerWidget {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          state.valueOrNull?.title ?? 'Trilha',
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+          state.asData?.value.title ?? 'Trilha',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w900,
+          ),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
@@ -47,6 +52,7 @@ class TrailDetailPage extends ConsumerWidget {
                   index: i + 1,
                   alignment: Alignment.center,
                   accent: visual.accent,
+                  isLocked: i > highestUnlockedIndex,
                   showConnector: i > 0,
                   onTap: () => context.go(
                     '/level/${trail.levelIds[i]}?trailId=${trail.id}',
@@ -56,6 +62,7 @@ class TrailDetailPage extends ConsumerWidget {
                 index: trail.levelIds.length,
                 alignment: Alignment.center,
                 accent: visual.accent,
+                isLocked: (trail.levelIds.length - 1) > highestUnlockedIndex,
                 showConnector: trail.levelIds.length > 1,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -78,8 +85,9 @@ class TrailDetailPage extends ConsumerWidget {
                 Text(
                   'Não foi possível carregar a trilha.',
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -87,8 +95,9 @@ class TrailDetailPage extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -194,7 +203,13 @@ class _DetailLoading extends StatelessWidget {
           4,
           (_) => const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
-            child: Center(child: ShimmerBox(height: 84, width: 84, borderRadius: 42)),
+            child: Center(
+              child: ShimmerBox(
+                height: 84,
+                width: 84,
+                borderRadius: 42,
+              ),
+            ),
           ),
         ),
       ],

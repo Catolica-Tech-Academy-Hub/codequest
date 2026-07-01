@@ -1,0 +1,29 @@
+stages:
+  - test
+  - build
+  - deploy
+
+unit-tests:
+  stage: test
+  image: python:3.11
+  script:
+    - pip install -r requirements.txt
+    - pytest tests/
+
+build-image:
+  stage: build
+  image: docker:24
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE .
+    - docker push $CI_REGISTRY_IMAGE
+
+deploy-prod:
+  stage: deploy
+  script:
+    - |
+      ssh deploy@$SERVER "
+        docker pull $CI_REGISTRY_IMAGE &&
+        docker-compose up -d
+      "
+  only:
+    - main

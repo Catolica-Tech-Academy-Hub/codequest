@@ -7,6 +7,7 @@ class LevelNode extends StatelessWidget {
     required this.accent,
     required this.onTap,
     this.showConnector = false,
+    this.isLocked = false,
     super.key,
   });
 
@@ -15,10 +16,16 @@ class LevelNode extends StatelessWidget {
   final Color accent;
   final VoidCallback onTap;
   final bool showConnector;
+  final bool isLocked;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final baseColor = isLocked ? theme.colorScheme.outline : accent;
+    final shadowColor = isLocked
+        ? theme.colorScheme.outline.withValues(alpha: 0.2)
+        : accent.withValues(alpha: 0.45);
+    final textColor = isLocked ? Colors.white70 : Colors.white;
 
     return Column(
       children: <Widget>[
@@ -37,7 +44,7 @@ class LevelNode extends StatelessWidget {
           child: Align(
             alignment: alignment,
             child: InkWell(
-              onTap: onTap,
+              onTap: isLocked ? null : onTap,
               customBorder: const CircleBorder(),
               child: Container(
                 width: 84,
@@ -47,16 +54,20 @@ class LevelNode extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [accent, Color.lerp(accent, Colors.black, 0.35)!],
+                    colors: [
+                      baseColor,
+                      Color.lerp(baseColor, Colors.black, 0.35)!,
+                    ],
                   ),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color:
+                        Colors.white.withValues(alpha: isLocked ? 0.25 : 0.6),
                     width: 3,
                   ),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: accent.withValues(alpha: 0.45),
+                      color: shadowColor,
                       blurRadius: 16,
                       offset: const Offset(0, 8),
                     ),
@@ -65,7 +76,7 @@ class LevelNode extends StatelessWidget {
                 child: Text(
                   '$index',
                   style: theme.textTheme.headlineSmall?.copyWith(
-                    color: Colors.white,
+                    color: textColor,
                     fontWeight: FontWeight.w900,
                   ),
                 ),

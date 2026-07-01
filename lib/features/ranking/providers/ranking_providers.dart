@@ -66,12 +66,12 @@ final leagueInfoStreamProvider =
 // Estado derivado: entrada do usuário logado no ranking
 // ---------------------------------------------------------------------------
 
-/// Deriva a posição atual do usuário logado a partir do stream do ranking.
-///
-/// Evita consulta separada ao Firestore — resolve em memória.
+/// Deriva a posição atual do usuário logado a partir do estado já observado
+/// do ranking, sem abrir uma assinatura adicional.
 final currentUserRankingEntryProvider =
-    StreamProvider.family<RankingEntry?, String>((ref, leagueId) {
-  return ref.watch(leagueRankingStreamProvider(leagueId).stream).map(
-        (entries) => entries.where((e) => e.isCurrentUser).firstOrNull,
-      );
+    Provider.family<AsyncValue<RankingEntry?>, String>((ref, leagueId) {
+  final rankingAsync = ref.watch(leagueRankingStreamProvider(leagueId));
+  return rankingAsync.whenData(
+    (entries) => entries.where((e) => e.isCurrentUser).firstOrNull,
+  );
 });

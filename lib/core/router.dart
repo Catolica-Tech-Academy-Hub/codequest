@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:codequest/features/achievements/presentation/achievements_page.dart';
 import 'package:codequest/features/auth/presentation/login_page.dart';
 import 'package:codequest/features/auth/presentation/register_page.dart';
 import 'package:codequest/features/auth/providers/auth_providers.dart';
@@ -71,6 +72,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: '/home/ranking',
             builder: (BuildContext context, GoRouterState state) =>
                 const RankingScreen(),
+          ),
+          GoRoute(
+            path: '/home/achievements',
+            builder: (BuildContext context, GoRouterState state) =>
+                const AchievementsPage(),
           ),
           GoRoute(
             path: '/home/profile',

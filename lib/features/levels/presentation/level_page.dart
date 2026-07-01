@@ -1,3 +1,4 @@
+import 'package:codequest/features/achievements/presentation/achievements_feedback.dart';
 import 'package:codequest/features/auth/providers/auth_providers.dart';
 import 'package:codequest/features/levels/presentation/level_builder.dart';
 import 'package:codequest/features/levels/providers/level_providers.dart';
@@ -18,22 +19,19 @@ class LevelPage extends ConsumerWidget {
 
   void _continue(BuildContext context, WidgetRef ref) async {
     final trail = trailId;
-    
+
     if (trail != null && trail.isNotEmpty) {
       final user = ref.read(currentUserProvider);
       if (user != null) {
-        // Encontra o índice deste nível na trilha atual
         final trailState = ref.read(trailByIdProvider(trail)).valueOrNull;
         if (trailState != null) {
           final levelIndex = trailState.levelIds.indexOf(levelId);
           if (levelIndex != -1) {
-            // Destrava o próximo nível
             await ref.read(unlockNextLevelUseCaseProvider).execute(
                   userId: user.uid,
                   trailId: trail,
                   completedLevelIndex: levelIndex,
                 );
-            // Invalida o cache do progresso para atualizar a tela
             ref.invalidate(userTrailProgressProvider(trail));
           }
         }
@@ -57,7 +55,12 @@ class LevelPage extends ConsumerWidget {
             data: (level) => SingleChildScrollView(
               child: LevelBuilder(
                 level: level,
-                onContinue: () => _continue(context, ref),
+                onContinue: () async {
+                  await triggerAchievementsCheck(ref, context);
+                  if (context.mounted) {
+                    _continue(context, ref);
+                  }
+                },
               ),
             ),
             loading: () => const Center(child: CircularProgressIndicator()),

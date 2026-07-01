@@ -20,10 +20,42 @@ const auth = getAuth();
 const db = getFirestore();
 
 const seedUsers = [
-  { uid: 'admin-001', email: 'admin@codequest.com', password: 'Dev@123456', displayName: 'Admin' },
-  { uid: 'dev-001', email: 'dev@codequest.com', password: 'Dev@123456', displayName: 'Dev User' },
-  { uid: 'dev-002', email: 'alice@codequest.com', password: 'Dev@123456', displayName: 'Alice' },
-  { uid: 'dev-003', email: 'bob@codequest.com', password: 'Dev@123456', displayName: 'Bob' },
+  {
+    uid: 'admin-001',
+    email: 'admin@codequest.com',
+    password: 'Dev@123456',
+    displayName: 'Admin',
+    xpTotal: 150,
+    streakDays: 15,
+    positionChange: 0,
+  },
+  {
+    uid: 'dev-001',
+    email: 'dev@codequest.com',
+    password: 'Dev@123456',
+    displayName: 'Dev User',
+    xpTotal: 120,
+    streakDays: 7,
+    positionChange: 1,
+  },
+  {
+    uid: 'dev-002',
+    email: 'alice@codequest.com',
+    password: 'Dev@123456',
+    displayName: 'Alice',
+    xpTotal: 100,
+    streakDays: 7,
+    positionChange: -1,
+  },
+  {
+    uid: 'dev-003',
+    email: 'bob@codequest.com',
+    password: 'Dev@123456',
+    displayName: 'Bob',
+    xpTotal: 90,
+    streakDays: 3,
+    positionChange: 2,
+  },
 ];
 
 const bronzeLeagueId = 'bronze-001';
@@ -100,6 +132,7 @@ async function upsertUser(user) {
 async function seed() {
   console.log('[seed] start');
   const now = new Date().toISOString();
+  const leagueEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   // 1. Seed Users com estrutura completa
   for (const user of seedUsers) {
@@ -110,42 +143,47 @@ async function seed() {
       name: user.displayName,
       displayName: user.displayName,
       leagueId: bronzeLeagueId,
-      xpTotal: 0,
-      streakDays: 0,
-      positionChange: 0,
+      xpTotal: user.xpTotal,
+      streakDays: user.streakDays,
+      positionChange: user.positionChange,
       createdAt: now,
       updatedAt: now,
     }, { merge: true });
   }
 
   // 2. Seed Leagues
-  const leagueMembers = [
-    { uid: 'dev-001', name: 'Dev User', xp: 120, weeklyXp: 45 },
-    { uid: 'dev-002', name: 'Alice', xp: 100, weeklyXp: 30 },
-    { uid: 'dev-003', name: 'Bob', xp: 90, weeklyXp: 25 },
-  ];
+  const leagueMembers = seedUsers
+    .filter((user) => user.uid !== 'admin-001')
+    .map((user, index) => ({
+      uid: user.uid,
+      name: user.displayName,
+      xpTotal: user.xpTotal,
+      weeklyXp: user.xpTotal,
+      position: index + 1,
+      positionChange: user.positionChange,
+    }));
 
   await db.collection('leagues').doc(bronzeLeagueId).set({
     id: bronzeLeagueId,
     name: 'Bronze',
-    tier: 1,
-    promotionThreshold: 100,
+    tier: 'bronze',
+    promotionThreshold: 15,
     totalParticipants: leagueMembers.length,
-    endsAt: null,
+    endsAt: leagueEndsAt,
     createdAt: now,
     updatedAt: now,
   }, { merge: true });
 
-  for (let index = 0; index < leagueMembers.length; index += 1) {
-    const member = leagueMembers[index];
+  for (const member of leagueMembers) {
     await db.collection('leagues').doc(bronzeLeagueId).collection('members').doc(member.uid).set({
       uid: member.uid,
       name: member.name,
-      xp: member.xp,
+      xpTotal: member.xpTotal,
       weeklyXp: member.weeklyXp,
-      position: index + 1,
-      deltaPosition: 0,
+      position: member.position,
+      positionChange: member.positionChange,
       leagueId: bronzeLeagueId,
+      createdAt: now,
       updatedAt: now,
     }, { merge: true });
   }

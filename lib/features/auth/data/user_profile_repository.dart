@@ -15,7 +15,13 @@ class UserProfileRepository implements UserProfileRepositoryContract {
         'uid': profile.uid,
         'email': profile.email,
         'name': profile.name,
+        // Campos lidos pelo ranking; inicializados no cadastro para que o aluno
+        // já apareça na liga com 0 XP.
+        'displayName': profile.name,
         'leagueId': profile.leagueId,
+        'xpTotal': 0,
+        'streakDays': 0,
+        'positionChange': 0,
         'createdAt': FieldValue.serverTimestamp(),
       },
       SetOptions(merge: true),
@@ -36,6 +42,36 @@ class UserProfileRepository implements UserProfileRepositoryContract {
       name: data['name'] as String,
       leagueId: data['leagueId'] as String,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
+      bio: data['bio'] as String?,
+      notificationsEnabled: (data['notificationsEnabled'] as bool?) ?? true,
     );
   }
+
+  @override
+  Future<void> updateProfile({
+    required String uid,
+    required String name,
+    String? bio,
+  }) async {
+    await _firestore.collection('users').doc(uid).update({
+      'name': name,
+      'bio': bio,
+    });
+  }
+
+  @override
+  Future<void> deleteProfile(String uid) async {
+    await _firestore.collection('users').doc(uid).delete();
+  }
+
+  @override
+  Future<void> updateNotificationPreferences({
+    required String uid,
+    required bool enabled,
+  }) async {
+    await _firestore.collection('users').doc(uid).update({
+      'notificationsEnabled': enabled,
+    });
+  }
+
 }

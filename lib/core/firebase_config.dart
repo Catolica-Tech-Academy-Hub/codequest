@@ -13,8 +13,11 @@ class AppFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     // Opções mínimas para bootstrap local sem arquivos nativos.
     // Em produção, substituir por valores reais do projeto.
+    // A apiKey precisa respeitar o formato AIza... (39 chars): o SDK de Cloud
+    // Functions no Android valida o formato antes de chamar, mesmo no emulador
+    // (Auth/Firestore não validam). Valor fake só para passar na validação local.
     return const FirebaseOptions(
-      apiKey: 'codequest-local-api-key',
+      apiKey: 'AIzaSyCodequestLocalEmulatorDummyKey000',
       appId: '1:1234567890:android:codequestlocal',
       messagingSenderId: '1234567890',
       projectId: 'codequest-local',
@@ -30,9 +33,14 @@ Future<void> configureFirebase() async {
 
   final String host = _resolveEmulatorHost();
 
-  await FirebaseAuth.instance.useAuthEmulator(host, 9099);
-  FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
-  FirebaseFunctions.instance.useFunctionsEmulator(host, 5001);
+  try {
+    await FirebaseAuth.instance.useAuthEmulator(host, 9099);
+    FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
+    FirebaseFunctions.instance.useFunctionsEmulator(host, 5001);
+  } catch (_) {
+    // Em hot restart os emuladores já estão apontados; reconfigurar lança e pode
+    // ser ignorado com segurança.
+  }
 }
 
 String _resolveEmulatorHost() {

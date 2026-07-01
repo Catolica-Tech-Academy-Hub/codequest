@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const { createPromotionNotification } = require('../notifications');
 
 /**
  * Processa o ciclo da liga (promoções, rebaixamentos, premiação e reset de XP).
@@ -80,7 +81,7 @@ async function processLeagueCycle() {
         // Se mudou de liga (promovido ou rebaixado)
         if (action !== 'maintain') {
           const destLeagueId = leaguesByTier[newTier];
-          
+
           if (destLeagueId) {
             // Remove da liga atual
             batch.delete(memberDoc.ref);
@@ -96,11 +97,20 @@ async function processLeagueCycle() {
             operationCount++;
 
             // Atualiza os metadados no perfil do usuário
-            batch.set(userRef, { 
+            batch.set(userRef, {
               tier: newTier,
               leagueId: destLeagueId
             }, { merge: true });
             operationCount++;
+
+            // Notificação de promoção (push + e-mail)
+            if (action === 'promote') {
+              try {
+                await createPromotionNotification(userId, tier, newTier);
+              } catch (err) {
+                console.warn(`Falha ao criar notificação de promoção para ${userId}:`, err.message);
+              }
+            }
           }
         } 
         // Se se manteve na mesma liga

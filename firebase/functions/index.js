@@ -1,12 +1,22 @@
 const admin = require('firebase-admin');
-const { onRequest } = require('firebase-functions/v2/https');
+const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https');
+const { onDocumentCreated, onDocumentWritten } = require('firebase-functions/v2/firestore');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
+const functionsV1 = require('firebase-functions/v1');
 const { createSampleModule } = require('./modules/sample');
-const { processLeagueCycle } = require('./modules/leagues');
+const { createAchievementsModule } = require('./modules/achievements');
+const { createRankingModule } = require('./modules/ranking');
+const { createStatisticsModule } = require('./modules/statistics');
+const { createUserModule } = require('./modules/user');
+const { processMailDocument, sendWelcomeEmail } = require('./modules/notifications');
 
 admin.initializeApp();
 
 const sampleController = createSampleModule();
+const checkAchievementsAction = createAchievementsModule();
+const rankingController = createRankingModule();
+const statisticsController = createStatisticsModule();
+const userController = createUserModule();
 
 // HTTP Trigger - Health check
 exports.health = onRequest((request, response) => {
@@ -32,9 +42,58 @@ exports.sampleApi = onRequest(async (request, response) => {
   response.status(405).json({ message: 'Method not allowed' });
 });
 
-// Pub/Sub Trigger - Ciclo Semanal das Ligas
-// Executa todo domingo às 23:59
-exports.weeklyLeagueCycle = onSchedule("59 23 * * 0", async (event) => {
-  console.log("Iniciando rotina semanal do sistema de ligas...");
-  await processLeagueCycle();
+exports.checkAchievements = onCall(async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) {
+    throw new HttpsError('unauthenticated', 'Necessário estar autenticado.');
+  }
+
+  return checkAchievementsAction.execute(uid);
+});
+
+exports.getPlayerStats = onCall((request) =>
+  statisticsController.getPlayerStats(request),
+);
+
+exports.getXpHistory = onCall((request) =>
+  statisticsController.getXpHistory(request),
+);
+
+exports.updateUserProfile = onCall(userController.updateProfile);
+
+exports.updateUserNotifications = onCall(userController.updateNotifications);
+
+exports.deleteUserAccount = onCall(userController.deleteAccount);
+
+exports.onLessonCompleted = onDocumentCreated(
+  'users/{uid}/progress/{progressId}',
+  (event) => rankingController.onLessonCompleted(event),
+);
+
+exports.recalculateLeagueRankings = onDocumentWritten(
+  'users/{uid}',
+  (event) => rankingController.recalculateLeagueRankings(event),
+);
+
+exports.weeklyReset = onSchedule(
+  { schedule: '0 0 * * 1', timeZone: 'America/Sao_Paulo' },
+  () => rankingController.weeklyReset(),
+);
+
+exports.onUserDeleted = functionsV1.auth
+  .user()
+  .onDelete((user) => rankingController.onUserDeleted(user));
+
+// Firestore Trigger - Processa envio de e-mail ao criar documento em `mail`
+exports.onMailCreated = onDocumentCreated('mail/{mailId}', async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  await processMailDocument(snapshot);
+});
+
+// Firestore Trigger - Envia e-mail de boas-vindas ao criar novo usuário
+exports.onUserCreated = onDocumentCreated('users/{userId}', async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  await sendWelcomeEmail(event.params.userId);
 });

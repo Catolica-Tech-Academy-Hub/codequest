@@ -20,4 +20,15 @@ abstract class AuthRepositoryContract {
   Future<void> signOut();
 
   Future<void> sendPasswordReset(EmailAddress email);
+
+  Future<void> reauthenticate({
+    required EmailAddress email,
+    required Password password,
+  });
+
+  Future<void> updatePassword({required Password newPassword});
+
+  Future<void> updateDisplayName({required DisplayName displayName});
+
+  Future<void> deleteCurrentUser();
 }

@@ -38,18 +38,19 @@ services:
     depends_on:
       firebase-emulators:
         condition: service_healthy
-    working_dir: /workspace/seed
+    working_dir: /workspace/firebase/seed
     command: >
       sh -c "
       npm install &&
-      node seed.js
+      node seed.js &&
+      node seed_achievements.js
       "
     environment:
       FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-codequest-local}
       FIRESTORE_EMULATOR_HOST: firebase-emulators:8080
       FIREBASE_AUTH_EMULATOR_HOST: firebase-emulators:9099
     volumes:
-      - ./firebase/seed:/workspace/seed
+      - ./firebase:/workspace/firebase
     restart: "no"
 
 volumes:

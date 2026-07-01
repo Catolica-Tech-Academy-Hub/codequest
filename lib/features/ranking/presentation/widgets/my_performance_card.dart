@@ -72,7 +72,7 @@ class MyPerformanceCard extends StatelessWidget {
                       label: 'Posição',
                       value: '#${entry.position}',
                       icon: '🏅',
-                      color: Colors.amber,
+                      color: Colors.amberAccent,
                     ),
                   ],
                 ),

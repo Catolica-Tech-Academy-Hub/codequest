@@ -60,6 +60,7 @@ const seedUsers = [
 
 const bronzeLeagueId = 'bronze-001';
 const trailId = 'flutter-basico';
+const historyWeeks = 10;
 
 const trailLevels = [
   { id: 'nivel-01', type: 'theory', title: 'Introducao ao Flutter', xpReward: 20, order: 1 },
@@ -129,12 +130,56 @@ async function upsertUser(user) {
   }
 }
 
+function mondayUtc(weeksAgo) {
+  const now = new Date();
+  const date = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  );
+  const daysSinceMonday = (date.getUTCDay() + 6) % 7;
+  date.setUTCDate(date.getUTCDate() - daysSinceMonday - weeksAgo * 7);
+  return date;
+}
+
+function buildXpHistory(user, position) {
+  const total = user.xpTotal || 0;
+  let weightSum = 0;
+  for (let i = 1; i <= historyWeeks; i += 1) {
+    weightSum += i;
+  }
+
+  const entries = [];
+  let cumulative = 0;
+  for (let i = 0; i < historyWeeks; i += 1) {
+    const weeksAgo = historyWeeks - 1 - i;
+    let gain = Math.round((total * (i + 1)) / weightSum);
+    if (i === historyWeeks - 1) {
+      gain = total - cumulative;
+    }
+    cumulative += gain;
+    const weekStart = mondayUtc(weeksAgo);
+    entries.push({
+      weekStartId: weekStart.toISOString().slice(0, 10),
+      weekStart,
+      xpTotal: cumulative,
+      xpGained: gain,
+      position,
+      streakDays: Math.max(0, (user.streakDays || 0) - weeksAgo),
+    });
+  }
+  return entries;
+}
+
 async function seed() {
   console.log('[seed] start');
   const now = new Date().toISOString();
   const leagueEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-  // 1. Seed Users com estrutura completa
+  const rankedUsers = [...seedUsers].sort((a, b) => b.xpTotal - a.xpTotal);
+  const positionByUid = Object.fromEntries(
+    rankedUsers.map((user, index) => [user.uid, index + 1]),
+  );
+
+  // 1. Seed Users com estado do jogo e histórico semanal.
   for (const user of seedUsers) {
     await upsertUser(user);
     await db.collection('users').doc(user.uid).set({
@@ -144,24 +189,40 @@ async function seed() {
       displayName: user.displayName,
       leagueId: bronzeLeagueId,
       xpTotal: user.xpTotal,
+      weeklyXp: user.xpTotal,
       streakDays: user.streakDays,
+      position: positionByUid[user.uid],
       positionChange: user.positionChange,
       createdAt: now,
       updatedAt: now,
     }, { merge: true });
+
+    const history = buildXpHistory(user, positionByUid[user.uid]);
+    for (const entry of history) {
+      await db
+        .collection('users')
+        .doc(user.uid)
+        .collection('xpHistory')
+        .doc(entry.weekStartId)
+        .set({
+          weekStart: entry.weekStart,
+          xpTotal: entry.xpTotal,
+          xpGained: entry.xpGained,
+          position: entry.position,
+          streakDays: entry.streakDays,
+        }, { merge: true });
+    }
   }
 
   // 2. Seed Leagues
-  const leagueMembers = seedUsers
-    .filter((user) => user.uid !== 'admin-001')
-    .map((user, index) => ({
-      uid: user.uid,
-      name: user.displayName,
-      xpTotal: user.xpTotal,
-      weeklyXp: user.xpTotal,
-      position: index + 1,
-      positionChange: user.positionChange,
-    }));
+  const leagueMembers = rankedUsers.map((user) => ({
+    uid: user.uid,
+    name: user.displayName,
+    xpTotal: user.xpTotal,
+    weeklyXp: user.xpTotal,
+    position: positionByUid[user.uid],
+    positionChange: user.positionChange,
+  }));
 
   await db.collection('leagues').doc(bronzeLeagueId).set({
     id: bronzeLeagueId,

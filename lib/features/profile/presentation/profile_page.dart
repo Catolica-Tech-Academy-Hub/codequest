@@ -99,6 +99,12 @@ class ProfilePage extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
+                onPressed: () => context.push('/statistics'),
+                icon: const Icon(Icons.insights_outlined),
+                label: const Text('Ver Estatísticas da Conta'),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
                 onPressed: () => context.push('/settings/notifications'),
                 icon: const Icon(Icons.notifications_outlined),
                 label: const Text('Configurar Notificações'),

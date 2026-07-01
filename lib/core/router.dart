@@ -15,6 +15,7 @@ import 'package:codequest/features/profile/presentation/edit_profile_page.dart';
 import 'package:codequest/features/profile/presentation/profile_page.dart';
 import 'package:codequest/features/profile/presentation/settings_page.dart';
 import 'package:codequest/features/ranking/presentation/ranking_page.dart';
+import 'package:codequest/features/statistics/presentation/statistics_page.dart';
 import 'package:codequest/features/trails/presentation/trail_detail_page.dart';
 import 'package:codequest/features/trails/presentation/trails_page.dart';
 import 'package:codequest/screens/notification_settings_screen.dart';
@@ -104,6 +105,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/settings/delete-account',
         builder: (BuildContext context, GoRouterState state) =>
             const DeleteAccountPage(),
+      ),
+      GoRoute(
+        path: '/statistics',
+        builder: (BuildContext context, GoRouterState state) =>
+            const StatisticsPage(),
       ),
       GoRoute(
         path: '/trail/:trailId',

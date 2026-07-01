@@ -15,13 +15,15 @@ class UserProfileRepository implements UserProfileRepositoryContract {
         'uid': profile.uid,
         'email': profile.email,
         'name': profile.name,
-        // Campos lidos pelo ranking; inicializados no cadastro para que o aluno
-        // já apareça na liga com 0 XP.
         'displayName': profile.name,
+        'avatarUrl': profile.avatarUrl,
+        'settings': profile.settings,
         'leagueId': profile.leagueId,
         'xpTotal': 0,
         'streakDays': 0,
         'positionChange': 0,
+        'bio': profile.bio,
+        'notificationsEnabled': profile.notificationsEnabled,
         'createdAt': FieldValue.serverTimestamp(),
       },
       SetOptions(merge: true),
@@ -42,6 +44,8 @@ class UserProfileRepository implements UserProfileRepositoryContract {
       name: data['name'] as String,
       leagueId: data['leagueId'] as String,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
+      avatarUrl: data['avatarUrl'] as String?,
+      settings: (data['settings'] as Map<String, dynamic>?) ?? const {},
       bio: data['bio'] as String?,
       notificationsEnabled: (data['notificationsEnabled'] as bool?) ?? true,
     );
@@ -55,6 +59,7 @@ class UserProfileRepository implements UserProfileRepositoryContract {
   }) async {
     await _firestore.collection('users').doc(uid).update({
       'name': name,
+      'displayName': name,
       'bio': bio,
     });
   }
@@ -73,5 +78,4 @@ class UserProfileRepository implements UserProfileRepositoryContract {
       'notificationsEnabled': enabled,
     });
   }
-
 }

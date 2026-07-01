@@ -31,7 +31,8 @@ final deleteAccountActionProvider = Provider<DeleteAccountAction>((ref) {
   );
 });
 
-final updateNotificationsActionProvider = Provider<UpdateNotificationsAction>((ref) {
+final updateNotificationsActionProvider =
+    Provider<UpdateNotificationsAction>((ref) {
   return UpdateNotificationsAction(ref.watch(userProfileRepositoryProvider));
 });
 

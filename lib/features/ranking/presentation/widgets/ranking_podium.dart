@@ -213,14 +213,18 @@ class _AvatarBadge extends StatelessWidget {
       child: CircleAvatar(
         radius: size / 2,
         backgroundColor: ringColor.withOpacity(0.15),
-        child: Text(
-          initial,
-          style: TextStyle(
-            fontSize: size * 0.42,
-            fontWeight: FontWeight.bold,
-            color: ringColor,
-          ),
-        ),
+        backgroundImage:
+            entry.avatarUrl != null ? NetworkImage(entry.avatarUrl!) : null,
+        child: entry.avatarUrl == null
+            ? Text(
+                initial,
+                style: TextStyle(
+                  fontSize: size * 0.42,
+                  fontWeight: FontWeight.bold,
+                  color: ringColor,
+                ),
+              )
+            : null,
       ),
     );
   }

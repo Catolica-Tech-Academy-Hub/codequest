@@ -200,14 +200,18 @@ class _SmallAvatar extends StatelessWidget {
     return CircleAvatar(
       radius: 20,
       backgroundColor: colorScheme.secondaryContainer,
-      child: Text(
-        initial,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          color: colorScheme.onSecondaryContainer,
-        ),
-      ),
+      backgroundImage:
+          entry.avatarUrl != null ? NetworkImage(entry.avatarUrl!) : null,
+      child: entry.avatarUrl == null
+          ? Text(
+              initial,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSecondaryContainer,
+              ),
+            )
+          : null,
     );
   }
 }

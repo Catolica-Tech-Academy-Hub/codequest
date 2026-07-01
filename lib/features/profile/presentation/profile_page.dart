@@ -1,67 +1,85 @@
 import 'package:codequest/features/auth/domain/entities/user_profile.dart';
+import 'package:codequest/features/notifications/domain/entities/notification_preferences.dart';
 import 'package:codequest/features/auth/providers/auth_providers.dart';
+import 'package:codequest/features/notifications/presentation/widgets/streak_reminder_badge.dart';
+import 'package:codequest/features/notifications/providers/notification_providers.dart';
 import 'package:codequest/features/profile/providers/profile_providers.dart';
+import 'package:codequest/features/statistics/domain/player_stats.dart';
+import 'package:codequest/features/statistics/providers/statistics_providers.dart';
 import 'package:codequest/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Tela de perfil do usuário.
-///
-/// Widget fino — apenas consome estado via [profileNotifierProvider]
-/// e delega ações de volta ao notifier. Nenhuma regra de negócio aqui.
-class ProfileScreen extends ConsumerWidget {
-  const ProfileScreen({super.key});
+class ProfilePage extends ConsumerWidget {
+  const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profileAsync = ref.watch(profileNotifierProvider);
+    final user = ref.watch(currentUserProvider);
+    final profileAsync = ref.watch(currentUserProfileProvider);
+    final statsAsync = ref.watch(playerStatsProvider);
+    final prefsAsync = ref.watch(notificationPreferencesProvider);
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Usuário não autenticado.')),
+      );
+    }
 
     return Scaffold(
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => _ErrorView(error: error),
         data: (profile) {
-          if (profile == null) {
-            return const _ErrorView(error: 'Perfil não encontrado.');
-          }
-          return _ProfileBody(profile: profile);
+          final displayName = profile?.name ?? user.displayName ?? 'Usuário';
+          final email = profile?.email ?? user.email;
+
+          return _ProfileBody(
+            displayName: displayName,
+            email: email,
+            profile: profile,
+            statsAsync: statsAsync,
+            prefsAsync: prefsAsync,
+          );
         },
       ),
     );
   }
 }
 
-// =============================================================================
-// Header com avatar, nome, e-mail e badge
-// =============================================================================
-
 class _ProfileBody extends ConsumerWidget {
-  const _ProfileBody({required this.profile});
+  const _ProfileBody({
+    required this.displayName,
+    required this.email,
+    required this.profile,
+    required this.statsAsync,
+    required this.prefsAsync,
+  });
 
-  final UserProfile profile;
+  final String displayName;
+  final String email;
+  final UserProfile? profile;
+  final AsyncValue<PlayerStats> statsAsync;
+  final AsyncValue<NotificationPreferences> prefsAsync;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
+    final stats = statsAsync.valueOrNull;
 
     return CustomScrollView(
       slivers: [
-        // ------------------------------------------------------------------
-        // Header com gradiente
-        // ------------------------------------------------------------------
         SliverToBoxAdapter(
           child: Container(
-            width: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
                   AppColors.primary,
-                  AppColors.primary.withValues(alpha: 0.75),
+                  AppColors.primary.withValues(alpha: 0.78),
                   colorScheme.primaryContainer,
                 ],
               ),
@@ -69,126 +87,116 @@ class _ProfileBody extends ConsumerWidget {
             child: SafeArea(
               bottom: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
                 child: Column(
                   children: [
-                    // Avatar
-                    _AnimatedAvatar(
-                      avatarUrl: profile.avatarUrl,
-                      name: profile.name,
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                        onPressed: () => context.push('/settings'),
+                        icon: const Icon(Icons.settings_outlined),
+                        color: Colors.white,
+                        tooltip: 'Configurações',
+                      ),
                     ),
-
+                    _ProfileAvatar(
+                      name: displayName,
+                      avatarUrl: profile?.avatarUrl,
+                    ),
                     const SizedBox(height: 16),
-
-                    // Nome
                     Text(
-                      profile.name,
+                      displayName,
+                      textAlign: TextAlign.center,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
                       ),
                     ),
-
                     const SizedBox(height: 4),
-
-                    // E-mail
                     Text(
-                      profile.email,
+                      email,
+                      textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.white70,
                       ),
                     ),
-
-                    const SizedBox(height: 14),
-
-                    // Liga badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3),
+                    if ((profile?.bio ?? '').trim().isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        profile!.bio!,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.92),
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.emoji_events_rounded,
-                            size: 16,
-                            color: Colors.amberAccent,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            profile.leagueId.toUpperCase(),
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                        ],
+                    ],
+                    const SizedBox(height: 14),
+                    _LeagueBadge(leagueId: stats?.leagueId ?? profile?.leagueId),
+                    const SizedBox(height: 18),
+                    _StatsRow(stats: stats),
+                    const SizedBox(height: 14),
+                    prefsAsync.when(
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
+                      data: (prefs) => StreakReminderBadge(
+                        active:
+                            prefs.pushEnabled && prefs.streakReminderEnabled,
                       ),
                     ),
-
-                    const SizedBox(height: 24),
-
-                    // Estatísticas de Desempenho
-                    _PerformanceStatsRow(profile: profile),
                   ],
                 ),
               ),
             ),
           ),
         ),
-
-        // ------------------------------------------------------------------
-        // Atalho para o ranking (RF01)
-        // ------------------------------------------------------------------
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
           sliver: SliverToBoxAdapter(
             child: _RankingShortcutCard(
-              isDark: isDark,
-              colorScheme: colorScheme,
+              onTap: () => context.go('/home/ranking'),
             ),
           ),
         ),
-
-        // ------------------------------------------------------------------
-        // Seção de configurações
-        // ------------------------------------------------------------------
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
           sliver: SliverToBoxAdapter(
             child: Text(
-              'Configurações',
+              'Ações',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
             ),
           ),
         ),
-
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           sliver: SliverToBoxAdapter(
-            child: _SettingsCard(
-              profile: profile,
-              isDark: isDark,
-              colorScheme: colorScheme,
+            child: _ActionGroup(
+              children: [
+                _ActionTile(
+                  icon: Icons.edit_outlined,
+                  label: 'Editar Perfil',
+                  onTap: () => context.push('/settings/edit-profile'),
+                ),
+                _ActionTile(
+                  icon: Icons.insights_outlined,
+                  label: 'Ver Estatísticas da Conta',
+                  onTap: () => context.push('/statistics'),
+                ),
+                _ActionTile(
+                  icon: Icons.notifications_outlined,
+                  label: 'Configurar Notificações',
+                  onTap: () => context.push('/settings/notifications'),
+                ),
+                _ActionTile(
+                  icon: Icons.lock_outline,
+                  label: 'Alterar Senha',
+                  onTap: () => context.push('/settings/change-password'),
+                ),
+              ],
             ),
           ),
         ),
-
-        // ------------------------------------------------------------------
-        // Seção conta
-        // ------------------------------------------------------------------
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
           sliver: SliverToBoxAdapter(
@@ -200,48 +208,61 @@ class _ProfileBody extends ConsumerWidget {
             ),
           ),
         ),
-
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           sliver: SliverToBoxAdapter(
-            child: _AccountCard(isDark: isDark, colorScheme: colorScheme),
+            child: _ActionGroup(
+              children: [
+                _ActionTile(
+                  icon: Icons.delete_outline,
+                  label: 'Excluir Conta',
+                  destructive: true,
+                  onTap: () => context.push('/settings/delete-account'),
+                ),
+                _ActionTile(
+                  icon: Icons.logout_rounded,
+                  label: 'Sair da Conta',
+                  destructive: true,
+                  onTap: () async {
+                    await ref.read(authControllerProvider).signOut();
+                    if (context.mounted) {
+                      context.go('/login');
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-
-        // Espaço inferior para não colar na bottom nav
         const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
       ],
     );
   }
 }
 
-// =============================================================================
-// Avatar animado
-// =============================================================================
+class _ProfileAvatar extends StatelessWidget {
+  const _ProfileAvatar({
+    required this.name,
+    required this.avatarUrl,
+  });
 
-class _AnimatedAvatar extends StatelessWidget {
-  const _AnimatedAvatar({required this.avatarUrl, required this.name});
-
-  final String? avatarUrl;
   final String name;
-
-  String get _initials {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.length >= 2) {
-      return '${parts.first[0]}${parts[1][0]}'.toUpperCase();
-    }
-    return name.isNotEmpty ? name[0].toUpperCase() : '?';
-  }
+  final String? avatarUrl;
 
   @override
   Widget build(BuildContext context) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    final initials = parts.length >= 2
+        ? '${parts.first[0]}${parts.last[0]}'.toUpperCase()
+        : (name.isNotEmpty ? name[0].toUpperCase() : '?');
+
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 3),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
+            color: Colors.black.withValues(alpha: 0.22),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -250,11 +271,10 @@ class _AnimatedAvatar extends StatelessWidget {
       child: CircleAvatar(
         radius: 48,
         backgroundColor: Colors.white24,
-        backgroundImage:
-            avatarUrl != null ? NetworkImage(avatarUrl!) : null,
+        backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl!) : null,
         child: avatarUrl == null
             ? Text(
-                _initials,
+                initials,
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
@@ -267,146 +287,42 @@ class _AnimatedAvatar extends StatelessWidget {
   }
 }
 
-// =============================================================================
-// Card de configurações (switches)
-// =============================================================================
+class _LeagueBadge extends StatelessWidget {
+  const _LeagueBadge({required this.leagueId});
 
-class _SettingsCard extends ConsumerWidget {
-  const _SettingsCard({
-    required this.profile,
-    required this.isDark,
-    required this.colorScheme,
-  });
-
-  final UserProfile profile;
-  final bool isDark;
-  final ColorScheme colorScheme;
+  final String? leagueId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final settings = profile.settings;
+  Widget build(BuildContext context) {
+    final text = (leagueId == null || leagueId!.isEmpty)
+        ? 'SEM LIGA'
+        : leagueId!.toUpperCase();
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: isDark ? colorScheme.surfaceContainerHigh : Colors.white,
-      child: Column(
-        children: [
-          _SettingsTile(
-            icon: Icons.notifications_active_rounded,
-            iconColor: Colors.orange,
-            title: 'Notificações',
-            subtitle: 'Receber alertas de novos desafios',
-            trailing: Switch.adaptive(
-              value: settings['notifications_enabled'] == true,
-              activeTrackColor: AppColors.primary,
-              onChanged: (value) => _update(ref, 'notifications_enabled', value),
-            ),
-          ),
-          const _TileDivider(),
-          _SettingsTile(
-            icon: Icons.dark_mode_rounded,
-            iconColor: Colors.deepPurple,
-            title: 'Modo escuro',
-            subtitle: 'Alternar aparência do app',
-            trailing: Switch.adaptive(
-              value: settings['dark_mode'] == true,
-              activeTrackColor: AppColors.primary,
-              onChanged: (value) => _update(ref, 'dark_mode', value),
-            ),
-          ),
-          const _TileDivider(),
-          _SettingsTile(
-            icon: Icons.volume_up_rounded,
-            iconColor: Colors.teal,
-            title: 'Sons',
-            subtitle: 'Efeitos sonoros durante os desafios',
-            trailing: Switch.adaptive(
-              value: settings['sounds_enabled'] != false,
-              activeTrackColor: AppColors.primary,
-              onChanged: (value) => _update(ref, 'sounds_enabled', value),
-            ),
-          ),
-          const _TileDivider(),
-          _SettingsTile(
-            icon: Icons.translate_rounded,
-            iconColor: Colors.indigo,
-            title: 'Idioma',
-            subtitle: settings['language']?.toString() ?? 'Português (BR)',
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () {
-              // Delegado à UI de seleção (futuro)
-            },
-          ),
-        ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.3),
+        ),
       ),
-    );
-  }
-
-  void _update(WidgetRef ref, String key, dynamic value) {
-    final updated = Map<String, dynamic>.from(profile.settings);
-    updated[key] = value;
-    ref.read(profileNotifierProvider.notifier).updateSettings(updated);
-  }
-}
-
-// =============================================================================
-// Card de conta (logout, etc.)
-// =============================================================================
-
-class _AccountCard extends ConsumerWidget {
-  const _AccountCard({required this.isDark, required this.colorScheme});
-
-  final bool isDark;
-  final ColorScheme colorScheme;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: isDark ? colorScheme.surfaceContainerHigh : Colors.white,
-      child: Column(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          _SettingsTile(
-            icon: Icons.shield_rounded,
-            iconColor: Colors.blueGrey,
-            title: 'Privacidade',
-            subtitle: 'Gerencie seus dados',
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () {},
+          const Icon(
+            Icons.emoji_events_rounded,
+            size: 16,
+            color: Colors.amberAccent,
           ),
-          const _TileDivider(),
-          _SettingsTile(
-            icon: Icons.info_outline_rounded,
-            iconColor: Colors.cyan,
-            title: 'Sobre o app',
-            subtitle: 'Versão e licenças',
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () {
-              showAboutDialog(
-                context: context,
-                applicationName: 'CodeQuest',
-                applicationVersion: '1.0.0',
-              );
-            },
-          ),
-          const _TileDivider(),
-          _SettingsTile(
-            icon: Icons.logout_rounded,
-            iconColor: AppColors.danger,
-            title: 'Sair da conta',
-            subtitle: 'Encerrar sessão atual',
-            trailing: const Icon(
-              Icons.chevron_right_rounded,
-              color: AppColors.danger,
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1.2,
             ),
-            onTap: () async {
-              await ref.read(authControllerProvider).signOut();
-              if (context.mounted) {
-                context.go('/login');
-              }
-            },
           ),
         ],
       ),
@@ -414,252 +330,10 @@ class _AccountCard extends ConsumerWidget {
   }
 }
 
-// =============================================================================
-// Componentes auxiliares de layout
-// =============================================================================
+class _StatsRow extends StatelessWidget {
+  const _StatsRow({required this.stats});
 
-class _SettingsTile extends StatelessWidget {
-  const _SettingsTile({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.subtitle,
-    required this.trailing,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String subtitle;
-  final Widget trailing;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
-          children: [
-            // Ícone com fundo
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: iconColor, size: 20),
-            ),
-
-            const SizedBox(width: 14),
-
-            // Texto
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            trailing,
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TileDivider extends StatelessWidget {
-  const _TileDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Divider(
-      height: 1,
-      indent: 70,
-      endIndent: 16,
-      color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
-    );
-  }
-}
-
-// =============================================================================
-// Card de atalho para o ranking (RF01)
-// =============================================================================
-
-class _RankingShortcutCard extends StatelessWidget {
-  const _RankingShortcutCard({
-    required this.isDark,
-    required this.colorScheme,
-  });
-
-  final bool isDark;
-  final ColorScheme colorScheme;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      clipBehavior: Clip.antiAlias,
-      color: isDark ? colorScheme.surfaceContainerHigh : Colors.white,
-      child: InkWell(
-        onTap: () => context.go('/home/ranking'),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              // Ícone com fundo gradiente
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.amber.shade600,
-                      Colors.orange.shade700,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.amber.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.emoji_events_rounded,
-                  color: Colors.white,
-                  size: 22,
-                ),
-              ),
-
-              const SizedBox(width: 14),
-
-              // Texto
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Ver Ranking',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Confira sua posição na classificação',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Icon(
-                Icons.chevron_right_rounded,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// =============================================================================
-// Tela de erro
-// =============================================================================
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.error});
-
-  final Object error;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.error_outline_rounded,
-              size: 56,
-              color: AppColors.danger.withValues(alpha: 0.6),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Não foi possível carregar o perfil',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error.toString(),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// =============================================================================
-// Componentes de Estatística de Desempenho
-// =============================================================================
-
-/// TODO(Front-end): Extension temporária (Mock).
-/// Os campos `xp`, `position` e `streak` devem vir diretamente da entidade
-/// [UserProfile] ou [UserPerformance] quando a camada de dados for integrada.
-/// Remova esta extension quando o backend/Repository estiver pronto.
-extension UserProfileStatsExtension on UserProfile {
-  int get xp => 1250;
-  int get position => 42;
-  int get streak => 7;
-}
-
-class _PerformanceStatsRow extends StatelessWidget {
-  const _PerformanceStatsRow({required this.profile});
-
-  final UserProfile profile;
+  final PlayerStats? stats;
 
   @override
   Widget build(BuildContext context) {
@@ -668,19 +342,19 @@ class _PerformanceStatsRow extends StatelessWidget {
       children: [
         _StatItem(
           label: 'XP',
-          value: profile.xp.toString(),
+          value: stats != null ? '${stats!.xpTotal}' : '--',
           icon: Icons.star_rounded,
           color: Colors.orangeAccent,
         ),
         _StatItem(
           label: 'Posição',
-          value: '#${profile.position}',
+          value: stats != null ? '#${stats!.position}' : '--',
           icon: Icons.leaderboard_rounded,
-          color: Colors.blueAccent,
+          color: Colors.lightBlueAccent,
         ),
         _StatItem(
           label: 'Ofensiva',
-          value: '${profile.streak} dias',
+          value: stats != null ? '${stats!.streakDays} dias' : '--',
           icon: Icons.local_fire_department_rounded,
           color: Colors.deepOrangeAccent,
         ),
@@ -723,6 +397,165 @@ class _StatItem extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _RankingShortcutCard extends StatelessWidget {
+  const _RankingShortcutCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.amber.shade600, Colors.orange.shade700],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.emoji_events_rounded,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Ver Ranking',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Confira sua posição na classificação',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionGroup extends StatelessWidget {
+  const _ActionGroup({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Column(children: children),
+    );
+  }
+}
+
+class _ActionTile extends StatelessWidget {
+  const _ActionTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.destructive = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool destructive;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = destructive
+        ? AppColors.danger
+        : Theme.of(context).colorScheme.primary;
+
+    return ListTile(
+      onTap: onTap,
+      leading: Icon(icon, color: color),
+      title: Text(
+        label,
+        style: TextStyle(
+          color: destructive ? AppColors.danger : null,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      trailing: const Icon(Icons.chevron_right_rounded),
+    );
+  }
+}
+
+class _ErrorView extends StatelessWidget {
+  const _ErrorView({required this.error});
+
+  final Object error;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 56,
+              color: AppColors.danger.withValues(alpha: 0.6),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Não foi possível carregar o perfil',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error.toString(),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

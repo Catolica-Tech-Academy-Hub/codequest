@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:codequest/features/levels/domain/entities/level.dart';
 import 'package:codequest/features/levels/domain/entities/level_result.dart';
 import 'package:codequest/features/levels/domain/value_objects/answer_key.dart';
 import 'package:codequest/features/levels/presentation/widgets/answer_option_tile.dart';
 import 'package:codequest/features/levels/presentation/widgets/rich_level_text.dart';
+import 'package:codequest/features/levels/presentation/widgets/theory_dialog.dart';
 import 'package:codequest/features/levels/providers/level_providers.dart';
+import 'package:codequest/features/xp/providers/xp_providers.dart';
 import 'package:codequest/shared/widgets/feedback_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,6 +30,18 @@ class _OneChoiceLevelWidgetState extends ConsumerState<OneChoiceLevelWidget> {
   AnswerKey? _selected;
   LevelResult? _result;
 
+  @override
+  void initState() {
+    super.initState();
+    // RF05: exibe a Teoria em pop-up antes do exercício, após o primeiro frame.
+    final theory = widget.level.theory;
+    if (theory != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) showTheoryDialog(context, theory);
+      });
+    }
+  }
+
   void _select(AnswerKey key) {
     if (_result != null) return;
     setState(() => _selected = key);
@@ -38,6 +54,13 @@ class _OneChoiceLevelWidgetState extends ConsumerState<OneChoiceLevelWidget> {
         .read(levelControllerProvider)
         .evaluate(widget.level, <AnswerKey>{selected});
     setState(() => _result = result);
+
+    unawaited(
+      ref.read(xpControllerProvider).awardForLevel(
+            level: widget.level,
+            result: result,
+          ),
+    );
 
     if (!mounted) return;
     await showFeedbackModal(

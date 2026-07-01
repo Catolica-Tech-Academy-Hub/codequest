@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/ranking_entry.dart';
+import 'package:codequest/features/ranking/domain/ranking_entry.dart';
 
 /// Exibe o pódio gamificado com os 3 primeiros colocados.
 ///

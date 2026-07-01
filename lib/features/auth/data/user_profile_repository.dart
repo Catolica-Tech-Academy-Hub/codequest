@@ -10,14 +10,20 @@ class UserProfileRepository implements UserProfileRepositoryContract {
 
   @override
   Future<void> createProfile(UserProfile profile) async {
-    await _firestore.collection('users').doc(profile.id).set(
+    await _firestore.collection('users').doc(profile.uid).set(
       {
-        'uid': profile.id,
+        'uid': profile.uid,
         'email': profile.email,
         'name': profile.name,
+        'displayName': profile.name,
         'avatarUrl': profile.avatarUrl,
         'settings': profile.settings,
         'leagueId': profile.leagueId,
+        'xpTotal': 0,
+        'streakDays': 0,
+        'positionChange': 0,
+        'bio': profile.bio,
+        'notificationsEnabled': profile.notificationsEnabled,
         'createdAt': FieldValue.serverTimestamp(),
       },
       SetOptions(merge: true),
@@ -33,13 +39,43 @@ class UserProfileRepository implements UserProfileRepositoryContract {
 
     final data = doc.data()!;
     return UserProfile(
-      id: data['uid'] as String,
+      uid: data['uid'] as String,
       email: data['email'] as String,
       name: data['name'] as String,
-      avatarUrl: data['avatarUrl'] as String?,
-      settings: (data['settings'] as Map<String, dynamic>?) ?? const {},
       leagueId: data['leagueId'] as String,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
+      avatarUrl: data['avatarUrl'] as String?,
+      settings: (data['settings'] as Map<String, dynamic>?) ?? const {},
+      bio: data['bio'] as String?,
+      notificationsEnabled: (data['notificationsEnabled'] as bool?) ?? true,
     );
+  }
+
+  @override
+  Future<void> updateProfile({
+    required String uid,
+    required String name,
+    String? bio,
+  }) async {
+    await _firestore.collection('users').doc(uid).update({
+      'name': name,
+      'displayName': name,
+      'bio': bio,
+    });
+  }
+
+  @override
+  Future<void> deleteProfile(String uid) async {
+    await _firestore.collection('users').doc(uid).delete();
+  }
+
+  @override
+  Future<void> updateNotificationPreferences({
+    required String uid,
+    required bool enabled,
+  }) async {
+    await _firestore.collection('users').doc(uid).update({
+      'notificationsEnabled': enabled,
+    });
   }
 }

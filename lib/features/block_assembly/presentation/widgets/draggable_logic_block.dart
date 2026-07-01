@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/entities/logic_block.dart';
+import 'package:codequest/features/block_assembly/domain/entities/logic_block.dart';
 
 /// Widget que representa um bloco lógico individual que pode ser arrastado.
 ///

@@ -12,25 +12,25 @@ sealed class BlockAssemblyError implements Exception {
 
 /// Bloco solicitado não foi encontrado.
 class BlockNotFoundError extends BlockAssemblyError {
-  const BlockNotFoundError(String message) : super(message);
+  const BlockNotFoundError(super.message);
 }
 
 /// Sequência de blocos inválida ou incompleta.
 class InvalidSequenceError extends BlockAssemblyError {
-  const InvalidSequenceError(String message) : super(message);
+  const InvalidSequenceError(super.message);
 }
 
 /// Limite de tentativas excedido.
 class MaxAttemptsExceededError extends BlockAssemblyError {
-  const MaxAttemptsExceededError(String message) : super(message);
+  const MaxAttemptsExceededError(super.message);
 }
 
 /// Desafio não encontrado ou não está acessível.
 class ChallengeNotAccessibleError extends BlockAssemblyError {
-  const ChallengeNotAccessibleError(String message) : super(message);
+  const ChallengeNotAccessibleError(super.message);
 }
 
 /// Falha ao salvar resultado no repositório.
 class RepositoryError extends BlockAssemblyError {
-  const RepositoryError(String message) : super(message);
+  const RepositoryError(super.message);
 }

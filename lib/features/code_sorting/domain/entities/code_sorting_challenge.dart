@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import 'code_line.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_line.dart';
 
 /// Entidade que representa um desafio de ordenação de código.
 ///

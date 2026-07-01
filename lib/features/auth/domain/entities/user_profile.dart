@@ -4,29 +4,25 @@
 /// infraestrutura — apenas Dart puro (DIP / Clean Architecture).
 class UserProfile {
   const UserProfile({
-    required this.id,
-    required this.name,
+    required this.uid,
     required this.email,
-    this.avatarUrl,
-    this.settings = const {},
+    required this.name,
     required this.leagueId,
     required this.createdAt,
+    this.avatarUrl,
+    this.settings = const {},
+    this.bio,
+    this.notificationsEnabled = true,
   });
 
   /// Identificador único do usuário (geralmente o UID do Auth provider).
-  final String id;
-
-  /// Nome de exibição do usuário.
-  final String name;
+  final String uid;
 
   /// E-mail cadastrado.
   final String email;
 
-  /// URL do avatar do usuário (pode ser nulo caso não tenha sido definido).
-  final String? avatarUrl;
-
-  /// Mapa livre de configurações do usuário (ex.: tema, notificações, idioma).
-  final Map<String, dynamic> settings;
+  /// Nome de exibição do usuário.
+  final String name;
 
   /// Liga em que o usuário está inscrito.
   final String leagueId;
@@ -34,38 +30,35 @@ class UserProfile {
   /// Data de criação do perfil.
   final DateTime createdAt;
 
-  /// Cria uma cópia da entidade com campos opcionalmente sobrescritos.
+  /// URL do avatar do usuário (pode ser nulo caso não tenha sido definido).
+  final String? avatarUrl;
+
+  /// Mapa livre de configurações do usuário (ex.: tema, notificações, idioma).
+  final Map<String, dynamic> settings;
+
+  final String? bio;
+  final bool notificationsEnabled;
+
   UserProfile copyWith({
-    String? id,
-    String? name,
     String? email,
-    String? avatarUrl,
-    Map<String, dynamic>? settings,
+    String? name,
     String? leagueId,
     DateTime? createdAt,
+    String? avatarUrl,
+    Map<String, dynamic>? settings,
+    String? bio,
+    bool? notificationsEnabled,
   }) {
     return UserProfile(
-      id: id ?? this.id,
-      name: name ?? this.name,
+      uid: uid,
       email: email ?? this.email,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
-      settings: settings ?? this.settings,
+      name: name ?? this.name,
       leagueId: leagueId ?? this.leagueId,
       createdAt: createdAt ?? this.createdAt,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      settings: settings ?? this.settings,
+      bio: bio ?? this.bio,
+      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     );
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is UserProfile &&
-          runtimeType == other.runtimeType &&
-          id == other.id;
-
-  @override
-  int get hashCode => id.hashCode;
-
-  @override
-  String toString() =>
-      'UserProfile(id: $id, name: $name, email: $email, avatarUrl: $avatarUrl)';
 }

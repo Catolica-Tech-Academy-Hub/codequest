@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/ranking_entry.dart';
+import 'package:codequest/features/ranking/domain/ranking_entry.dart';
 
 /// Item individual na lista de ranking (posições 4+).
 ///

@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../application/actions/submit_assembly_attempt_use_case.dart';
-import '../application/actions/validate_assembly_use_case.dart';
-import '../data/repositories/block_assembly_repository.dart';
-import '../domain/repositories/block_assembly_repository_contract.dart';
+import 'package:codequest/features/block_assembly/application/actions/submit_assembly_attempt_use_case.dart';
+import 'package:codequest/features/block_assembly/application/actions/validate_assembly_use_case.dart';
+import 'package:codequest/features/block_assembly/data/repositories/block_assembly_repository.dart';
+import 'package:codequest/features/block_assembly/domain/repositories/block_assembly_repository_contract.dart';
 
 /// Provider para a instância do Firestore.
 final firestoreProvider = Provider<FirebaseFirestore>((ref) {

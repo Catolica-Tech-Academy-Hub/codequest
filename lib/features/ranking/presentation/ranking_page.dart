@@ -60,12 +60,11 @@ class _MockNotice extends StatelessWidget {
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../providers/ranking_providers.dart';
-import 'widgets/league_header.dart';
-import 'widgets/my_performance_card.dart';
-import 'widgets/ranking_list_item.dart';
-import 'widgets/ranking_podium.dart';
+import 'package:codequest/features/ranking/providers/ranking_providers.dart';
+import 'package:codequest/features/ranking/presentation/widgets/league_header.dart';
+import 'package:codequest/features/ranking/presentation/widgets/my_performance_card.dart';
+import 'package:codequest/features/ranking/presentation/widgets/ranking_list_item.dart';
+import 'package:codequest/features/ranking/presentation/widgets/ranking_podium.dart';
 
 /// Tela principal de ranking gamificado.
 ///
@@ -179,8 +178,7 @@ class _RankingBody extends ConsumerWidget {
                       return RankingListItem(
                         key: ValueKey(rest[index].userId),
                         entry: rest[index],
-                        animationDelay:
-                        Duration(milliseconds: index * 40),
+                        animationDelay: Duration(milliseconds: index * 40),
                       );
                     },
                   ),
@@ -197,8 +195,9 @@ class _RankingBody extends ConsumerWidget {
         myEntryAsync.when(
           loading: () => const SizedBox.shrink(),
           error: (_, __) => const SizedBox.shrink(),
-          data: (entry) =>
-          entry != null ? MyPerformanceCard(entry: entry) : const SizedBox.shrink(),
+          data: (entry) => entry != null
+              ? MyPerformanceCard(entry: entry)
+              : const SizedBox.shrink(),
         ),
       ],
     );
@@ -223,7 +222,7 @@ class _LoadingState extends StatelessWidget {
         const SizedBox(height: 16),
         ...List.generate(
           5,
-              (i) => Padding(
+          (i) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: _ShimmerBlock(height: 68),
           ),
@@ -342,7 +341,11 @@ class _ShimmerBlockState extends State<_ShimmerBlock>
       builder: (_, __) => Container(
         height: widget.height,
         decoration: BoxDecoration(
-          color: Color.lerp(base, base.withOpacity(0.3), _anim.value),
+          color: Color.lerp(
+            base,
+            base.withValues(alpha: 0.3),
+            _anim.value,
+          ),
           borderRadius: BorderRadius.circular(16),
         ),
       ),

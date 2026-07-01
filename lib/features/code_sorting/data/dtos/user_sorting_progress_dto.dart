@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../domain/entities/user_sorting_progress.dart';
+import 'package:codequest/features/code_sorting/domain/entities/user_sorting_progress.dart';
 
 class UserSortingProgressDto {
   const UserSortingProgressDto({

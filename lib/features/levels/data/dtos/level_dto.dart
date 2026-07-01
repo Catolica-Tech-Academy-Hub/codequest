@@ -51,6 +51,33 @@ class LevelDto {
     return question;
   }
 
+  /// Teoria é opcional (RF05). Retorna `null` quando ausente; valida quando
+  /// presente para evitar pop-ups com conteúdo malformado.
+  LevelTheory? _parseTheory() {
+    final theoryRaw = raw['theory'];
+    if (theoryRaw == null) {
+      return null;
+    }
+    if (theoryRaw is! Map) {
+      throw LevelFailure.malformedLevel(
+        '"theory" deve ser um objeto em "$id".',
+      );
+    }
+    final title = theoryRaw['title'];
+    if (title is! String || title.isEmpty) {
+      throw LevelFailure.malformedLevel(
+        '"theory.title" ausente ou vazio em "$id".',
+      );
+    }
+    final body = theoryRaw['body'];
+    if (body is! String || body.isEmpty) {
+      throw LevelFailure.malformedLevel(
+        '"theory.body" ausente ou vazio em "$id".',
+      );
+    }
+    return LevelTheory(title: title, body: body);
+  }
+
   OneChoiceLevel _buildOneChoice() {
     final question = _parseQuestion();
     final options = _parseAnswers();
@@ -69,6 +96,7 @@ class LevelDto {
       question: question,
       options: options,
       correctAnswer: correct,
+      theory: _parseTheory(),
     );
   }
 
@@ -101,6 +129,7 @@ class LevelDto {
       question: question,
       options: options,
       correctAnswers: correct,
+      theory: _parseTheory(),
     );
   }
 

@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../value_objects/block_id.dart';
-import '../value_objects/block_label.dart';
+import 'package:codequest/features/block_assembly/domain/value_objects/block_id.dart';
+import 'package:codequest/features/block_assembly/domain/value_objects/block_label.dart';
 
 /// Representa um bloco lógico individual no desafio de montagem.
 ///

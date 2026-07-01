@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/entities/logic_block.dart';
+import 'package:codequest/features/block_assembly/domain/entities/logic_block.dart';
 
 /// Widget que representa uma zona onde blocos podem ser soltos (drop zone).
 ///
@@ -73,14 +73,14 @@ class _DropZoneState extends State<DropZone>
     }
 
     return DragTarget<LogicBlock>(
-      onWillAccept: (data) {
+      onWillAcceptWithDetails: (data) {
         setState(() => _isHovering = true);
         return true;
       },
       onLeave: (data) {
         setState(() => _isHovering = false);
       },
-      onAccept: (block) {
+      onAcceptWithDetails: (block) {
         setState(() => _isHovering = false);
         widget.onAccept(block);
       },

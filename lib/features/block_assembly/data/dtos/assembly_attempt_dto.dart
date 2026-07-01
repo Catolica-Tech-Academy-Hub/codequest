@@ -1,5 +1,5 @@
-import '../../domain/entities/assembly_attempt.dart';
-import '../../domain/value_objects/block_id.dart';
+import 'package:codequest/features/block_assembly/domain/entities/assembly_attempt.dart';
+import 'package:codequest/features/block_assembly/domain/value_objects/block_id.dart';
 
 /// DTO que mapeia uma tentativa de montagem do Firestore para entidade de domínio.
 ///

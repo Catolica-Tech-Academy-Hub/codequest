@@ -42,6 +42,36 @@ class UserProfileRepository implements UserProfileRepositoryContract {
       name: data['name'] as String,
       leagueId: data['leagueId'] as String,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
+      bio: data['bio'] as String?,
+      notificationsEnabled: (data['notificationsEnabled'] as bool?) ?? true,
     );
   }
+
+  @override
+  Future<void> updateProfile({
+    required String uid,
+    required String name,
+    String? bio,
+  }) async {
+    await _firestore.collection('users').doc(uid).update({
+      'name': name,
+      'bio': bio,
+    });
+  }
+
+  @override
+  Future<void> deleteProfile(String uid) async {
+    await _firestore.collection('users').doc(uid).delete();
+  }
+
+  @override
+  Future<void> updateNotificationPreferences({
+    required String uid,
+    required bool enabled,
+  }) async {
+    await _firestore.collection('users').doc(uid).update({
+      'notificationsEnabled': enabled,
+    });
+  }
+
 }

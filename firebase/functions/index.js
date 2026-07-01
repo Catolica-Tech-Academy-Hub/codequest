@@ -1,15 +1,14 @@
 const admin = require('firebase-admin');
 const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https');
-const {
-  onDocumentCreated,
-  onDocumentWritten,
-} = require('firebase-functions/v2/firestore');
+const { onDocumentCreated, onDocumentWritten } = require('firebase-functions/v2/firestore');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const functionsV1 = require('firebase-functions/v1');
 const { createSampleModule } = require('./modules/sample');
 const { createAchievementsModule } = require('./modules/achievements');
 const { createRankingModule } = require('./modules/ranking');
 const { createStatisticsModule } = require('./modules/statistics');
+const { createUserModule } = require('./modules/user');
+const { processMailDocument, sendWelcomeEmail } = require('./modules/notifications');
 
 admin.initializeApp();
 
@@ -17,6 +16,7 @@ const sampleController = createSampleModule();
 const checkAchievementsAction = createAchievementsModule();
 const rankingController = createRankingModule();
 const statisticsController = createStatisticsModule();
+const userController = createUserModule();
 
 // HTTP Trigger - Health check
 exports.health = onRequest((request, response) => {
@@ -42,7 +42,6 @@ exports.sampleApi = onRequest(async (request, response) => {
   response.status(405).json({ message: 'Method not allowed' });
 });
 
-// Callable - Motor de conquistas (BE07)
 exports.checkAchievements = onCall(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
@@ -52,7 +51,6 @@ exports.checkAchievements = onCall(async (request) => {
   return checkAchievementsAction.execute(uid);
 });
 
-// Callables - Estatísticas e evolução temporal (RF03/RF07)
 exports.getPlayerStats = onCall((request) =>
   statisticsController.getPlayerStats(request),
 );
@@ -61,10 +59,12 @@ exports.getXpHistory = onCall((request) =>
   statisticsController.getXpHistory(request),
 );
 
-// Firestore/Scheduler Triggers - Ranking e ciclo semanal das ligas (evolucao-xp).
-// O weeklyReset substitui o antigo weeklyLeagueCycle (modules/leagues): ambos
-// faziam promoção/rebaixamento/reset; manter os dois processaria a liga em
-// duplicidade.
+exports.updateUserProfile = onCall(userController.updateProfile);
+
+exports.updateUserNotifications = onCall(userController.updateNotifications);
+
+exports.deleteUserAccount = onCall(userController.deleteAccount);
+
 exports.onLessonCompleted = onDocumentCreated(
   'users/{uid}/progress/{progressId}',
   (event) => rankingController.onLessonCompleted(event),
@@ -83,3 +83,17 @@ exports.weeklyReset = onSchedule(
 exports.onUserDeleted = functionsV1.auth
   .user()
   .onDelete((user) => rankingController.onUserDeleted(user));
+
+// Firestore Trigger - Processa envio de e-mail ao criar documento em `mail`
+exports.onMailCreated = onDocumentCreated('mail/{mailId}', async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  await processMailDocument(snapshot);
+});
+
+// Firestore Trigger - Envia e-mail de boas-vindas ao criar novo usuário
+exports.onUserCreated = onDocumentCreated('users/{userId}', async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  await sendWelcomeEmail(event.params.userId);
+});

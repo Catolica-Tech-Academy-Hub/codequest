@@ -2,6 +2,7 @@
 const { initializeApp } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 const { getFirestore } = require('firebase-admin/firestore');
+const { seedBlockAssemblyChallenges } = require('./block_assembly_seed.js');
 
 const projectId = process.env.FIREBASE_PROJECT_ID || 'codequest-local';
 
@@ -43,7 +44,7 @@ const seedUsers = [
     password: 'Dev@123456',
     displayName: 'Alice',
     xpTotal: 100,
-    streakDays: 5,
+    streakDays: 7,
     positionChange: -1,
   },
   {
@@ -58,45 +59,15 @@ const seedUsers = [
 ];
 
 const bronzeLeagueId = 'bronze-001';
-
 const trailId = 'flutter-basico';
+const historyWeeks = 10;
 
 const trailLevels = [
-  {
-    id: 'nivel-01',
-    type: 'theory',
-    title: 'Introducao ao Flutter',
-    xpReward: 20,
-    order: 1,
-  },
-  {
-    id: 'nivel-02',
-    type: 'quiz',
-    title: 'Quiz de Widgets',
-    xpReward: 25,
-    order: 2,
-  },
-  {
-    id: 'nivel-03',
-    type: 'code',
-    title: 'Pratica de Layout',
-    xpReward: 30,
-    order: 3,
-  },
-  {
-    id: 'nivel-04',
-    type: 'quiz',
-    title: 'Quiz de Estado',
-    xpReward: 25,
-    order: 4,
-  },
-  {
-    id: 'nivel-05',
-    type: 'challenge',
-    title: 'Desafio Final Basico',
-    xpReward: 50,
-    order: 5,
-  },
+  { id: 'nivel-01', type: 'theory', title: 'Introducao ao Flutter', xpReward: 20, order: 1 },
+  { id: 'nivel-02', type: 'quiz', title: 'Quiz de Widgets', xpReward: 25, order: 2 },
+  { id: 'nivel-03', type: 'code', title: 'Pratica de Layout', xpReward: 30, order: 3 },
+  { id: 'nivel-04', type: 'quiz', title: 'Quiz de Estado', xpReward: 25, order: 4 },
+  { id: 'nivel-05', type: 'challenge', title: 'Desafio Final Basico', xpReward: 50, order: 5 },
 ];
 
 const seedActivities = [
@@ -108,6 +79,8 @@ const seedActivities = [
     correctAnswer: 'Column',
     hint: 'Pense em eixo vertical.',
     xpReward: 10,
+    difficulty: 'easy',
+    isActive: true,
   },
   {
     id: 'act-002',
@@ -117,21 +90,19 @@ const seedActivities = [
     correctAnswer: 'contador++',
     hint: 'Atualize um estado simples.',
     xpReward: 10,
+    difficulty: 'easy',
+    isActive: true,
   },
   {
     id: 'act-003',
     type: 'codeOrder',
     question: 'Ordene o fluxo para renderizar um app Flutter.',
-    options: [
-      'runApp(MyApp())',
-      'WidgetsFlutterBinding.ensureInitialized()',
-      'main()',
-      'build(context)',
-    ],
-    correctAnswer:
-      'main() -> WidgetsFlutterBinding.ensureInitialized() -> runApp(MyApp()) -> build(context)',
+    options: ['runApp(MyApp())', 'WidgetsFlutterBinding.ensureInitialized()', 'main()', 'build(context)'],
+    correctAnswer: 'main() -> WidgetsFlutterBinding.ensureInitialized() -> runApp(MyApp()) -> build(context)',
     hint: 'Comeca no ponto de entrada do Dart.',
     xpReward: 15,
+    difficulty: 'medium',
+    isActive: true,
   },
 ];
 
@@ -159,9 +130,6 @@ async function upsertUser(user) {
   }
 }
 
-const HISTORY_WEEKS = 10;
-
-/** Segunda-feira 00:00 UTC de `weeksAgo` semanas atrás. */
 function mondayUtc(weeksAgo) {
   const now = new Date();
   const date = new Date(
@@ -172,24 +140,20 @@ function mondayUtc(weeksAgo) {
   return date;
 }
 
-/**
- * Gera HISTORY_WEEKS snapshots semanais de XP cumulativo crescente, terminando
- * exatamente no xpTotal atual do usuário (curva de evolução para o gráfico).
- */
 function buildXpHistory(user, position) {
   const total = user.xpTotal || 0;
   let weightSum = 0;
-  for (let i = 1; i <= HISTORY_WEEKS; i += 1) {
+  for (let i = 1; i <= historyWeeks; i += 1) {
     weightSum += i;
   }
 
   const entries = [];
   let cumulative = 0;
-  for (let i = 0; i < HISTORY_WEEKS; i += 1) {
-    const weeksAgo = HISTORY_WEEKS - 1 - i; // do mais antigo para o mais recente
+  for (let i = 0; i < historyWeeks; i += 1) {
+    const weeksAgo = historyWeeks - 1 - i;
     let gain = Math.round((total * (i + 1)) / weightSum);
-    if (i === HISTORY_WEEKS - 1) {
-      gain = total - cumulative; // fecha exatamente no total atual
+    if (i === historyWeeks - 1) {
+      gain = total - cumulative;
     }
     cumulative += gain;
     const weekStart = mondayUtc(weeksAgo);
@@ -207,35 +171,32 @@ function buildXpHistory(user, position) {
 
 async function seed() {
   console.log('[seed] start');
+  const now = new Date().toISOString();
+  const leagueEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-  // Posição final por XP (rank entre os seed users), reaproveitada no histórico.
-  const positionByUid = {};
-  [...seedUsers]
-    .sort((a, b) => b.xpTotal - a.xpTotal)
-    .forEach((user, index) => {
-      positionByUid[user.uid] = index + 1;
-    });
+  const rankedUsers = [...seedUsers].sort((a, b) => b.xpTotal - a.xpTotal);
+  const positionByUid = Object.fromEntries(
+    rankedUsers.map((user, index) => [user.uid, index + 1]),
+  );
 
+  // 1. Seed Users com estado do jogo e histórico semanal.
   for (const user of seedUsers) {
     await upsertUser(user);
-    // Estado de gamificação vive em `users/{uid}` (lido pelo ranking e pelas
-    // conquistas): xpTotal/streakDays/positionChange vêm do próprio seedUser.
-    await db.collection('users').doc(user.uid).set(
-      {
-        uid: user.uid,
-        email: user.email,
-        name: user.displayName,
-        displayName: user.displayName,
-        leagueId: bronzeLeagueId,
-        xpTotal: user.xpTotal,
-        streakDays: user.streakDays,
-        positionChange: user.positionChange,
-        updatedAt: new Date().toISOString(),
-      },
-      { merge: true },
-    );
+    await db.collection('users').doc(user.uid).set({
+      uid: user.uid,
+      email: user.email,
+      name: user.displayName,
+      displayName: user.displayName,
+      leagueId: bronzeLeagueId,
+      xpTotal: user.xpTotal,
+      weeklyXp: user.xpTotal,
+      streakDays: user.streakDays,
+      position: positionByUid[user.uid],
+      positionChange: user.positionChange,
+      createdAt: now,
+      updatedAt: now,
+    }, { merge: true });
 
-    // Histórico semanal de XP (evolução temporal) para a aba de Estatísticas.
     const history = buildXpHistory(user, positionByUid[user.uid]);
     for (const entry of history) {
       await db
@@ -243,106 +204,92 @@ async function seed() {
         .doc(user.uid)
         .collection('xpHistory')
         .doc(entry.weekStartId)
-        .set(
-          {
-            weekStart: entry.weekStart,
-            xpTotal: entry.xpTotal,
-            xpGained: entry.xpGained,
-            position: entry.position,
-            streakDays: entry.streakDays,
-          },
-          { merge: true },
-        );
+        .set({
+          weekStart: entry.weekStart,
+          xpTotal: entry.xpTotal,
+          xpGained: entry.xpGained,
+          position: entry.position,
+          streakDays: entry.streakDays,
+        }, { merge: true });
     }
   }
-  console.log(`[seed] xpHistory populated (${HISTORY_WEEKS} semanas/usuário)`);
 
-  const leagueEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  await db.collection('leagues').doc(bronzeLeagueId).set(
-    {
-      id: bronzeLeagueId,
-      name: 'Bronze',
-      // Campos lidos pelo ranking (_LeagueDto): tier textual + janela da liga.
-      tier: 'bronze',
-      endsAt: leagueEndsAt,
-      promotionThreshold: 15,
-      totalParticipants: seedUsers.length,
-      createdAt: new Date().toISOString(),
-    },
-    { merge: true },
-  );
+  // 2. Seed Leagues
+  const leagueMembers = rankedUsers.map((user) => ({
+    uid: user.uid,
+    name: user.displayName,
+    xpTotal: user.xpTotal,
+    weeklyXp: user.xpTotal,
+    position: positionByUid[user.uid],
+    positionChange: user.positionChange,
+  }));
 
-  const leagueMembers = [
-    { uid: 'dev-001', name: 'Dev User', xp: 120, weeklyXp: 45 },
-    { uid: 'dev-002', name: 'Alice', xp: 100, weeklyXp: 30 },
-    { uid: 'dev-003', name: 'Bob', xp: 90, weeklyXp: 25 },
-  ];
+  await db.collection('leagues').doc(bronzeLeagueId).set({
+    id: bronzeLeagueId,
+    name: 'Bronze',
+    tier: 'bronze',
+    promotionThreshold: 15,
+    totalParticipants: leagueMembers.length,
+    endsAt: leagueEndsAt,
+    createdAt: now,
+    updatedAt: now,
+  }, { merge: true });
 
-  for (let index = 0; index < leagueMembers.length; index += 1) {
-    const member = leagueMembers[index];
-    await db
-      .collection('leagues')
-      .doc(bronzeLeagueId)
-      .collection('members')
-      .doc(member.uid)
-      .set(
-        {
-          uid: member.uid,
-          name: member.name,
-          xp: member.xp,
-          weeklyXp: member.weeklyXp,
-          position: index + 1,
-          deltaPosition: 0,
-          leagueId: bronzeLeagueId,
-          updatedAt: new Date().toISOString(),
-        },
-        { merge: true },
-      );
+  for (const member of leagueMembers) {
+    await db.collection('leagues').doc(bronzeLeagueId).collection('members').doc(member.uid).set({
+      uid: member.uid,
+      name: member.name,
+      xpTotal: member.xpTotal,
+      weeklyXp: member.weeklyXp,
+      position: member.position,
+      positionChange: member.positionChange,
+      leagueId: bronzeLeagueId,
+      createdAt: now,
+      updatedAt: now,
+    }, { merge: true });
   }
 
-  await db.collection('trails').doc(trailId).set(
-    {
-      id: trailId,
-      title: 'Flutter Basico',
-      language: 'Dart',
-      totalLevels: trailLevels.length,
-      createdAt: new Date().toISOString(),
-    },
-    { merge: true },
-  );
+  // 3. Seed Trails
+  await db.collection('trails').doc(trailId).set({
+    id: trailId,
+    title: 'Flutter Basico',
+    language: 'Dart',
+    description: 'Trilha introdutória aos conceitos fundamentais do Flutter.',
+    totalLevels: trailLevels.length,
+    createdAt: now,
+    updatedAt: now,
+  }, { merge: true });
 
   for (const level of trailLevels) {
-    await db
-      .collection('trails')
-      .doc(trailId)
-      .collection('levels')
-      .doc(level.id)
-      .set(
-        {
-          ...level,
-          isUnlocked: level.order === 1,
-          isCompleted: false,
-          stars: 0,
-        },
-        { merge: true },
-      );
+    await db.collection('trails').doc(trailId).collection('levels').doc(level.id).set({
+      ...level,
+      isUnlocked: level.order === 1,
+      isCompleted: false,
+      stars: 0,
+    }, { merge: true });
   }
 
+  // 4. Seed Activities
   for (const activity of seedActivities) {
-    await db.collection('activities').doc(activity.id).set(activity, { merge: true });
+    await db.collection('activities').doc(activity.id).set({
+      ...activity,
+      createdAt: now,
+      updatedAt: now,
+    }, { merge: true });
   }
 
-  await db.collection('meta').doc('seed').set(
-    {
-      projectId,
-      appliedAt: new Date().toISOString(),
-      usersCount: seedUsers.length,
-      trailId,
-      leagueId: bronzeLeagueId,
-      activitiesCount: seedActivities.length,
-    },
-    { merge: true },
-  );
+  // 5. Seed Meta
+  await db.collection('meta').doc('seed').set({
+    projectId,
+    appliedAt: now,
+    usersCount: seedUsers.length,
+    trailId,
+    leagueId: bronzeLeagueId,
+    activitiesCount: seedActivities.length,
+  }, { merge: true });
+
+  // 6. Seed dos desafios de block assembly
+  await seedBlockAssemblyChallenges(db);
 
   console.log('[seed] done');
 }
@@ -353,4 +300,3 @@ seed()
     console.error('[seed] failed:', error);
     process.exit(1);
   });
-

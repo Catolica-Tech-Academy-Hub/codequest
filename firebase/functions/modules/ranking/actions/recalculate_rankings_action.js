@@ -29,7 +29,11 @@ class RecalculateRankingsAction {
         memberUpdates.push({
           leagueId,
           uid: user.id,
-          data: { position: newPosition, deltaPosition: positionChange },
+          data: {
+            position: newPosition,
+            positionChange,
+            deltaPosition: positionChange,
+          },
         });
       }
     });

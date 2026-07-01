@@ -1,4 +1,8 @@
+const admin = require('firebase-admin');
+const { createPromotionNotification } = require('../../notifications');
+
 const TIER_LADDER = ['bronze', 'silver', 'gold', 'diamond'];
+const AVATAR_REWARD_COUNT = 3;
 const PROMOTION_COUNT = 15;
 const DEMOTION_COUNT = 5;
 
@@ -76,8 +80,14 @@ class WeeklyResetAction {
         });
       });
 
-      for (const user of users) {
+      for (const [index, user] of users.entries()) {
         const data = { weeklyXp: 0, positionChange: 0 };
+
+        if (index < AVATAR_REWARD_COUNT) {
+          data.unlockedAvatars = admin.firestore.FieldValue.arrayUnion(
+            `avatar_${tier}_${index + 1}`,
+          );
+        }
 
         if (promoteLeagueId && promotionSet.has(user.id)) {
           data.leagueId = promoteLeagueId;
@@ -86,8 +96,9 @@ class WeeklyResetAction {
             name: user.displayName || user.name || 'Aluno',
             fromLeagueId: league.id,
             toLeagueId: promoteLeagueId,
-            xp: Number(user.xpTotal) || 0,
+            xpTotal: Number(user.xpTotal) || 0,
           });
+          await createPromotionNotification(user.id, tier, upTier);
           promoted += 1;
         } else if (
           demoteLeagueId &&
@@ -100,7 +111,7 @@ class WeeklyResetAction {
             name: user.displayName || user.name || 'Aluno',
             fromLeagueId: league.id,
             toLeagueId: demoteLeagueId,
-            xp: Number(user.xpTotal) || 0,
+            xpTotal: Number(user.xpTotal) || 0,
           });
           demoted += 1;
         }

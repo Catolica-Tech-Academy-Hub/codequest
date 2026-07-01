@@ -16,7 +16,7 @@ class TrailVisuals {
     TrailVisual(accent: AppColors.bronze, emoji: '⚡'),
     TrailVisual(accent: AppColors.gold, emoji: '🧩'),
     TrailVisual(accent: AppColors.diamond, emoji: '🚀'),
-    TrailVisual(accent: AppColors.bronze, emoji: '💩')
+    TrailVisual(accent: AppColors.bronze, emoji: '💩'),
   ];
 
   static const _overrides = <String, TrailVisual>{};

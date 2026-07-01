@@ -41,6 +41,7 @@ class RankingRepository {
         uid,
         name,
         leagueId,
+        xpTotal,
         xp: xpTotal,
         weeklyXp: admin.firestore.FieldValue.increment(awardedXp),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -108,7 +109,7 @@ class RankingRepository {
     await batch.commit();
   }
 
-  async moveMember({ uid, name, fromLeagueId, toLeagueId, xp }) {
+  async moveMember({ uid, name, fromLeagueId, toLeagueId, xpTotal }) {
     const batch = this._db.batch();
     if (fromLeagueId && fromLeagueId !== toLeagueId) {
       batch.delete(this._memberDoc(fromLeagueId, uid));
@@ -119,8 +120,10 @@ class RankingRepository {
         uid,
         name,
         leagueId: toLeagueId,
-        xp,
+        xpTotal,
+        xp: xpTotal,
         weeklyXp: 0,
+        positionChange: 0,
         deltaPosition: 0,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       },

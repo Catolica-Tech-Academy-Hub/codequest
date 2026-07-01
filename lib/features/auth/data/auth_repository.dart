@@ -75,6 +75,53 @@ class AuthRepository implements AuthRepositoryContract {
     }
   }
 
+  @override
+  Future<void> reauthenticate({
+    required EmailAddress email,
+    required Password password,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) throw AuthFailure.userNotFound();
+    final credential = EmailAuthProvider.credential(
+      email: email.value,
+      password: password.value,
+    );
+    try {
+      await user.reauthenticateWithCredential(credential);
+    } on FirebaseAuthException catch (error) {
+      throw _mapFirebaseAuthException(error);
+    }
+  }
+
+  @override
+  Future<void> updatePassword({required Password newPassword}) async {
+    final user = _auth.currentUser;
+    if (user == null) throw AuthFailure.userNotFound();
+    try {
+      await user.updatePassword(newPassword.value);
+    } on FirebaseAuthException catch (error) {
+      throw _mapFirebaseAuthException(error);
+    }
+  }
+
+  @override
+  Future<void> updateDisplayName({required DisplayName displayName}) async {
+    final user = _auth.currentUser;
+    if (user == null) throw AuthFailure.userNotFound();
+    await user.updateDisplayName(displayName.value);
+  }
+
+  @override
+  Future<void> deleteCurrentUser() async {
+    final user = _auth.currentUser;
+    if (user == null) throw AuthFailure.userNotFound();
+    try {
+      await user.delete();
+    } on FirebaseAuthException catch (error) {
+      throw _mapFirebaseAuthException(error);
+    }
+  }
+
   AuthUser? _mapFirebaseUser(User? user) {
     if (user == null) {
       return null;
@@ -103,6 +150,8 @@ class AuthRepository implements AuthRepositoryContract {
         return AuthFailure.operationNotAllowed();
       case 'weak-password':
         return AuthFailure.weakPassword();
+      case 'requires-recent-login':
+        return AuthFailure.requiresRecentLogin();
       default:
         return AuthFailure.unexpected();
     }

@@ -9,9 +9,17 @@ import 'package:hive_flutter/hive_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  await Firebase.initializeApp(
-    options: AppFirebaseOptions.currentPlatform,
-  );
+  // Hot restart re-executa main(), mas a instância nativa do Firebase persiste:
+  // reinicializar lança duplicate-app. Toleramos isso e seguimos com o app já vivo.
+  try {
+    await Firebase.initializeApp(
+      options: AppFirebaseOptions.currentPlatform,
+    );
+  } on FirebaseException catch (error) {
+    if (error.code != 'duplicate-app') {
+      rethrow;
+    }
+  }
   await configureFirebase();
   runApp(const ProviderScope(child: CodeQuestApp()));
 }

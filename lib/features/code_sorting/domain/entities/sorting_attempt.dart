@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../value_objects/line_id.dart';
+import 'package:codequest/features/code_sorting/domain/value_objects/line_id.dart';
 
 /// Representa uma tentativa de ordenação feita pelo usuário.
 ///

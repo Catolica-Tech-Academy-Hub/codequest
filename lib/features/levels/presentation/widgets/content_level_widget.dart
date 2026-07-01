@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:codequest/features/levels/domain/entities/level.dart';
 import 'package:codequest/features/levels/presentation/widgets/rich_level_text.dart';
+import 'package:codequest/features/xp/providers/xp_providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ContentLevelWidget extends StatelessWidget {
+class ContentLevelWidget extends ConsumerWidget {
   const ContentLevelWidget({
     required this.level,
     required this.onContinue,
@@ -12,8 +16,13 @@ class ContentLevelWidget extends StatelessWidget {
   final ContentLevel level;
   final VoidCallback onContinue;
 
+  void _onContinue(WidgetRef ref) {
+    unawaited(ref.read(xpControllerProvider).awardForLevel(level: level));
+    onContinue();
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -43,7 +52,7 @@ class ContentLevelWidget extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         FilledButton(
-          onPressed: onContinue,
+          onPressed: () => _onContinue(ref),
           child: const Text('Continuar'),
         ),
       ],

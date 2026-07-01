@@ -1,4 +1,4 @@
-import '../../domain/entities/user_challenge_progress.dart';
+import 'package:codequest/features/block_assembly/domain/entities/user_challenge_progress.dart';
 
 /// DTO que mapeia o progresso do usuário do Firestore para entidade de domínio.
 ///

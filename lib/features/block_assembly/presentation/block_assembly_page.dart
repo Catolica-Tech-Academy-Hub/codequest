@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:codequest/shared/widgets/feedback_modal.dart';
 
-import '../../domain/entities/assembly_challenge.dart';
-import '../../domain/entities/logic_block.dart';
-import '../../domain/value_objects/block_id.dart';
-import '../controllers/assembly_board_controller.dart';
-import '../widgets/draggable_logic_block.dart';
-import '../widgets/drop_zone.dart';
-import '../widgets/feedback_widgets.dart';
-import '../../providers/block_assembly_providers.dart';
-import '../../../../shared/widgets/feedback_modal.dart';
+import 'package:codequest/features/block_assembly/domain/entities/assembly_challenge.dart';
+import 'package:codequest/features/block_assembly/domain/entities/logic_block.dart';
+import 'package:codequest/features/block_assembly/domain/value_objects/block_id.dart';
+import 'package:codequest/features/block_assembly/presentation/controllers/assembly_board_controller.dart';
+import 'package:codequest/features/block_assembly/presentation/widgets/draggable_logic_block.dart';
+import 'package:codequest/features/block_assembly/presentation/widgets/drop_zone.dart';
+import 'package:codequest/features/block_assembly/presentation/widgets/feedback_widgets.dart';
+import 'package:codequest/features/block_assembly/providers/block_assembly_providers.dart';
 
 /// Tela principal do desafio de montagem lógica por blocos.
 ///
@@ -166,7 +166,7 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
           _BlocksSource(
             blocks: widget.challenge.blocks,
             selectedIds: {
-              for (final b in boardState.selectedSequence) b.id.value
+              for (final b in boardState.selectedSequence) b.id.value,
             },
           ),
           const SizedBox(height: 32),
@@ -225,9 +225,9 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
   }
 
   Future<void> _handleSubmit(
-      BuildContext context,
-      dynamic submitUseCase,
-      ) async {
+    BuildContext context,
+    dynamic submitUseCase,
+  ) async {
     final boardState = ref.read(assemblyBoardProvider);
 
     if (!boardState.isSequenceFull) {

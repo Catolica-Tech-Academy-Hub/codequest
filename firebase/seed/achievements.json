@@ -1,0 +1,47 @@
+[
+  {
+    "id": "first-xp",
+    "name": "Primeiros Passos",
+    "description": "Acumule seus primeiros 100 XP.",
+    "iconKey": "footprints",
+    "tier": "common",
+    "category": "xp",
+    "condition": { "field": "xpTotal", "operator": ">=", "value": 100 }
+  },
+  {
+    "id": "xp-veteran",
+    "name": "Veterano",
+    "description": "Alcance 500 XP no total.",
+    "iconKey": "medal",
+    "tier": "rare",
+    "category": "xp",
+    "condition": { "field": "xpTotal", "operator": ">=", "value": 500 }
+  },
+  {
+    "id": "streak-week",
+    "name": "Semana de Fogo",
+    "description": "Mantenha uma sequência de 7 dias.",
+    "iconKey": "flame",
+    "tier": "rare",
+    "category": "streak",
+    "condition": { "field": "streak", "operator": ">=", "value": 7 }
+  },
+  {
+    "id": "streak-month",
+    "name": "Mês Imparável",
+    "description": "Mantenha uma sequência de 30 dias.",
+    "iconKey": "fire-crown",
+    "tier": "legendary",
+    "category": "streak",
+    "condition": { "field": "streak", "operator": ">=", "value": 30 }
+  },
+  {
+    "id": "test",
+    "name": "Teste123321",
+    "description": "Isso é um teste! Vídeo.",
+    "iconKey": "fire-crown",
+    "tier": "legendary",
+    "category": "streak",
+    "condition": { "field": "streak", "operator": ">=", "value": 1 }
+  }
+]

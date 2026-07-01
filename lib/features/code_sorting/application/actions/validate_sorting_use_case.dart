@@ -1,6 +1,6 @@
-import '../../domain/entities/code_sorting_challenge.dart';
-import '../../domain/errors/code_sorting_error.dart';
-import '../../domain/value_objects/line_id.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_sorting_challenge.dart';
+import 'package:codequest/features/code_sorting/domain/errors/code_sorting_error.dart';
+import 'package:codequest/features/code_sorting/domain/value_objects/line_id.dart';
 
 /// Valida se a ordem submetida pelo usuário está correta.
 ///

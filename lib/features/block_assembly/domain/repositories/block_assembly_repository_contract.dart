@@ -1,6 +1,6 @@
-import '../entities/assembly_attempt.dart';
-import '../entities/assembly_challenge.dart';
-import '../entities/user_challenge_progress.dart';
+import 'package:codequest/features/block_assembly/domain/entities/assembly_attempt.dart';
+import 'package:codequest/features/block_assembly/domain/entities/assembly_challenge.dart';
+import 'package:codequest/features/block_assembly/domain/entities/user_challenge_progress.dart';
 
 /// Contrato abstrato para persistência de dados de block assembly.
 ///

@@ -1,5 +1,5 @@
-import 'ranking_entry.dart';
-import 'league_info.dart';
+import 'package:codequest/features/ranking/domain/ranking_entry.dart';
+import 'package:codequest/features/ranking/domain/league_info.dart';
 
 /// Contrato de acesso aos dados de ranking.
 ///

@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:codequest/features/levels/domain/entities/level.dart';
 import 'package:codequest/features/levels/domain/entities/level_result.dart';
 import 'package:codequest/features/levels/domain/value_objects/answer_key.dart';
 import 'package:codequest/features/levels/presentation/widgets/answer_option_tile.dart';
 import 'package:codequest/features/levels/presentation/widgets/rich_level_text.dart';
 import 'package:codequest/features/levels/providers/level_providers.dart';
+import 'package:codequest/features/xp/providers/xp_providers.dart';
 import 'package:codequest/shared/widgets/feedback_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,6 +46,13 @@ class _MultiChoiceLevelWidgetState extends ConsumerState<MultiChoiceLevelWidget>
         .read(levelControllerProvider)
         .evaluate(widget.level, Set<AnswerKey>.from(_selected));
     setState(() => _result = result);
+
+    unawaited(
+      ref.read(xpControllerProvider).awardForLevel(
+            level: widget.level,
+            result: result,
+          ),
+    );
 
     if (!mounted) return;
     await showFeedbackModal(

@@ -15,8 +15,9 @@ Plataforma gamificada de aprendizado de programação, construída com Flutter, 
 7. [Serviços disponíveis em desenvolvimento](#7-serviços-disponíveis-em-desenvolvimento)
 8. [Usuários de teste](#8-usuários-de-teste)
 9. [Arquitetura e padrões de código](#9-arquitetura-e-padrões-de-código)
-10. [Contribuindo (branch, commit e PR)](#10-contribuindo-branch-commit-e-pr)
-11. [Solução de problemas](#11-solução-de-problemas)
+10. [Estrutura de Dados e Backend (MVP)](#10-estrutura-de-dados-e-backend-mvp)
+11. [Contribuindo (branch, commit e PR)](#11-contribuindo-branch-commit-e-pr)
+12. [Solução de problemas](#12-solução-de-problemas)
 
 ---
 
@@ -315,7 +316,21 @@ lib/features/<feature>/
 
 ---
 
-## 10. Contribuindo (branch, commit e PR)
+## 10. Estrutura de Dados e Backend (MVP)
+
+A modelagem do banco de dados (Cloud Firestore) foi estruturada para atender aos requisitos de gamificação e trilhas de aprendizado, garantindo a persistência do estado do usuário e a correção automática das atividades.
+
+**Requisitos Atendidos (Tarefa BE-01):**
+* ✅ **Autenticação e Perfil:** Estrutura de usuários (`/users`) com tracking de XP, ligas e ofensivas (streak).
+* ✅ **Motor Gamificado:** Modelagem das trilhas (`/trails`), níveis e atividades (`/activities`), suportando múltiplos formatos de desafios.
+* ✅ **Módulo de Ligas:** Estrutura relacional via subcoleções (`/leagues/{id}/members`) para viabilizar o Ranking.
+* ✅ **Segurança:** Implementação de `firestore.rules` garantindo que dados sensíveis (como histórico de XP) sejam acessados apenas pelos proprietários.
+
+> 📄 **Dicionário de Dados:** Para visualizar a modelagem completa de documentos, coleções e atributos, consulte a [Documentação do Banco de Dados (DATABASE.md)](https://github.com/Catolica-Tech-Academy-Hub/codequest/firebase/DATABASE.md).
+
+---
+
+## 11. Contribuindo (branch, commit e PR)
 
 ### 1. Atualizar a base local
 
@@ -376,7 +391,7 @@ Inclua no corpo do PR:
 
 ---
 
-## 11. Solução de problemas
+## 12. Solução de problemas
 
 ### Docker não sobe / erro de engine
 

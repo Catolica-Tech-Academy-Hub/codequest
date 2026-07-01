@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain/entities/assembly_challenge.dart';
-import '../../domain/entities/logic_block.dart';
-import '../../domain/value_objects/block_id.dart';
-import '../controllers/assembly_board_controller.dart';
-import '../widgets/draggable_logic_block.dart';
-import '../widgets/drop_zone.dart';
-import '../widgets/feedback_widgets.dart';
-import '../../providers/block_assembly_providers.dart';
-import '../../../../shared/widgets/feedback_modal.dart';
+import 'package:codequest/features/block_assembly/domain/entities/assembly_challenge.dart';
+import 'package:codequest/features/block_assembly/domain/entities/logic_block.dart';
+import 'package:codequest/features/block_assembly/domain/value_objects/block_id.dart';
+import 'package:codequest/features/block_assembly/presentation/controllers/assembly_board_controller.dart';
+import 'package:codequest/features/block_assembly/presentation/widgets/draggable_logic_block.dart';
+import 'package:codequest/features/block_assembly/presentation/widgets/drop_zone.dart';
+import 'package:codequest/features/block_assembly/presentation/widgets/feedback_widgets.dart';
+import 'package:codequest/features/block_assembly/providers/block_assembly_providers.dart';
+import 'package:codequest/shared/widgets/feedback_modal.dart';
 
 /// Tela principal do desafio de montagem lógica por blocos.
 ///
@@ -192,9 +192,9 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
             error: (_, __) => const SizedBox.shrink(),
             data: (progress) => progress != null
                 ? RemainingAttemptsWidget(
-              current: progress.attemptCount,
-              max: widget.challenge.maxAttempts,
-            )
+                    current: progress.attemptCount,
+                    max: widget.challenge.maxAttempts,
+                  )
                 : const SizedBox.shrink(),
           ),
           const SizedBox(height: 16),
@@ -225,9 +225,9 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
   }
 
   Future<void> _handleSubmit(
-      BuildContext context,
-      dynamic submitUseCase,
-      ) async {
+    BuildContext context,
+    dynamic submitUseCase,
+  ) async {
     final boardState = ref.read(assemblyBoardProvider);
 
     if (!boardState.isSequenceFull) {
@@ -389,7 +389,7 @@ class _BlocksSource extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final availableBlocks =
-    blocks.where((b) => !selectedIds.contains(b.id.value)).toList();
+        blocks.where((b) => !selectedIds.contains(b.id.value)).toList();
 
     return Wrap(
       spacing: 8,
@@ -397,10 +397,10 @@ class _BlocksSource extends StatelessWidget {
       children: availableBlocks
           .map(
             (block) => DraggableLogicBlock(
-          block: block,
-          isSelected: false,
-        ),
-      )
+              block: block,
+              isSelected: false,
+            ),
+          )
           .toList(),
     );
   }
@@ -422,10 +422,10 @@ class _DropZonesRow extends ConsumerWidget {
     return Column(
       children: List.generate(
         challenge.blocks.length,
-            (index) {
+        (index) {
           final expectedBlock = challenge.blocks[index];
           final currentBlock =
-          index < selectedSequence.length ? selectedSequence[index] : null;
+              index < selectedSequence.length ? selectedSequence[index] : null;
           final hasError = validationErrors.contains(index);
 
           return Padding(
@@ -481,13 +481,13 @@ class _ActionButtons extends StatelessWidget {
             onPressed: isSubmitting || !isSequenceFull ? null : onSubmit,
             icon: isSubmitting
                 ? SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation(colorScheme.onPrimary),
-              ),
-            )
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation(colorScheme.onPrimary),
+                    ),
+                  )
                 : const Icon(Icons.check),
             label: Text(isSubmitting ? 'Enviando...' : 'Enviar'),
           ),

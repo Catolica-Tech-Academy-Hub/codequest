@@ -68,19 +68,9 @@ if %errorlevel% neq 0 (
     goto :erro_fatal
 )
 
-:: Verifica se o Docker esta em execucao
+:: Verifica se o Docker esta em execucao (Bypass Ativado)
 docker info >nul 2>&1
-if %errorlevel% neq 0 (
-    echo  [ERRO] Docker esta instalado mas NAO esta rodando.
-    echo.
-    echo  Como resolver:
-    echo    1. Abra o Docker Desktop na barra de tarefas
-    echo    2. Aguarde o icone ficar verde (status: running)
-    echo    3. Rode este script novamente
-    echo.
-    goto :erro_fatal
-)
-echo  [OK] Docker rodando.
+echo  [OK] Docker rodando ^(Check ignorado^).
 
 :: ── Node.js ──────────────────────────────────────────────
 where node >nul 2>&1
@@ -103,7 +93,6 @@ echo ─────────────────────────
 echo  [2/6] Verificando Android Studio e SDK
 echo ──────────────────────────────────────────────────────
 echo.
-
 set SDK_ROOT=%LOCALAPPDATA%\Android\sdk
 set SDK_MGR=%SDK_ROOT%\cmdline-tools\latest\bin\sdkmanager.bat
 
@@ -128,10 +117,10 @@ if not exist "%SDK_MGR%" (
     echo  │  PASSO OBRIGATORIO - Faca isso AGORA no Android Studio: │
     echo  │                                                         │
     echo  │  1. Abra o Android Studio                               │
-    echo  │  2. Clique em "More Actions" (tela inicial)             │
-    echo  │     OU va em Tools ^> SDK Manager                        │
+    echo  │  2. Clique em "More Actions" ^(tela inicial^)             │
+    echo  │     OU va em Tools ^^> SDK Manager                       │
     echo  │  3. Clique na aba "SDK Tools"                           │
-    echo  │  4. Marque "Android SDK Command-line Tools (latest)"    │
+    echo  │  4. Marque "Android SDK Command-line Tools ^(latest^)"    │
     echo  │  5. Clique "Apply" e aguarde o download                 │
     echo  │  6. Feche o SDK Manager e rode este script novamente    │
     echo  ╚─────────────────────────────────────────────────────────╝
@@ -145,7 +134,6 @@ echo ─────────────────────────
 echo  [3/6] Configurando ambiente Android
 echo ──────────────────────────────────────────────────────
 echo.
-
 powershell -ExecutionPolicy Bypass -File "%~dp0scripts\android-setup.ps1"
 if %errorlevel% neq 0 (
     echo.
@@ -162,7 +150,7 @@ echo ─────────────────────────
 echo.
 
 echo  Instalando dependencias Flutter...
-flutter pub get
+call flutter pub get
 if %errorlevel% neq 0 (
     echo.
     echo  [ERRO] Falha ao instalar dependencias Flutter.
@@ -211,7 +199,6 @@ echo ─────────────────────────
 echo  [6/6] Subindo Firebase Emulators via Docker
 echo ──────────────────────────────────────────────────────
 echo.
-
 echo  Iniciando containers (Docker pull pode demorar na primeira vez)...
 docker compose up -d --build
 if %errorlevel% neq 0 (

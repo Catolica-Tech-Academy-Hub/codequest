@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:codequest/shared/widgets/feedback_modal.dart';
 
-import '../domain/entities/code_sorting_challenge.dart';
-import '../domain/value_objects/line_id.dart';
-import '../providers/code_sorting_providers.dart';
-import 'controllers/sorting_board_controller.dart';
-import 'widgets/sortable_code_line.dart';
-import 'widgets/sorting_feedback_widgets.dart';
+import 'package:codequest/features/code_sorting/domain/entities/code_sorting_challenge.dart';
+import 'package:codequest/features/code_sorting/domain/value_objects/line_id.dart';
+import 'package:codequest/features/code_sorting/providers/code_sorting_providers.dart';
+import 'package:codequest/features/code_sorting/presentation/controllers/sorting_board_controller.dart';
+import 'package:codequest/features/code_sorting/presentation/widgets/sortable_code_line.dart';
+import 'package:codequest/features/code_sorting/presentation/widgets/sorting_feedback_widgets.dart';
 
 /// Tela principal do desafio de ordenação de linhas de código.
 ///
@@ -218,10 +219,6 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
 
     ref.read(sortingBoardProvider.notifier).setSubmitting(true);
 
-    final messenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
-    final errorColor = Theme.of(context).colorScheme.error;
-
     try {
       final result = await submitUseCase.call(
         challenge: widget.challenge,
@@ -233,19 +230,13 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
       if (!mounted) return;
 
       if (result.isCorrect) {
-        await showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => Dialog(
-            backgroundColor: Colors.transparent,
-            child: SortingSuccessOverlay(
-              xpEarned: result.xpEarned,
-              onDismiss: () {
-                navigator.pop(); // fecha dialog
-                navigator.pop(); // volta da tela
-              },
-            ),
-          ),
+        await showFeedbackModal(
+          context,
+          status: FeedbackStatus.correct,
+          message: 'Você ordenou o código corretamente!\nVocê ganhou +${result.xpEarned} XP!',
+          onContinue: () {
+            Navigator.of(context).pop();
+          },
         );
       } else {
         final expectedOrder = [...widget.challenge.lines]
@@ -259,21 +250,20 @@ class _ChallengeBodyState extends ConsumerState<_ChallengeBody> {
         }
         ref.read(sortingBoardProvider.notifier).setErrorIndices(errors);
 
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text(result.feedback),
-            duration: const Duration(seconds: 3),
-            backgroundColor: errorColor,
-          ),
+        await showFeedbackModal(
+          context,
+          status: FeedbackStatus.wrong,
+          message: result.feedback,
+          onContinue: () {},
         );
       }
     } catch (e) {
       if (mounted) {
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text('Erro ao enviar: $e'),
-            backgroundColor: errorColor,
-          ),
+        await showFeedbackModal(
+          context,
+          status: FeedbackStatus.wrong,
+          message: 'Erro ao enviar: $e',
+          onContinue: () {},
         );
       }
     } finally {
